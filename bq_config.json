@@ -132,6 +132,10 @@
     "data_type": "FLOAT"
    },
    {
+    "column_name": "average_cadence",
+    "data_type": "FLOAT"
+   },
+   {
     "column_name": "average_watts",
     "data_type": "FLOAT"
    },

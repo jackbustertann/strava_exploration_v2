@@ -4,6 +4,7 @@ from datetime import datetime
 from pytz import utc
 import pandas as pd
 import json
+import numpy as np
 
 from google.cloud import storage, bigquery
 
@@ -240,24 +241,36 @@ class ETL():
 
         df_casted = df.copy()
 
-        float_cols = [col['column_name'] for col in schema if col['data_type'] == 'FLOAT']
+        float_cols = [col['column_name'] for col in schema if (col['data_type'] == 'FLOAT')]
         for float_col in float_cols:
-            df_casted[float_col] = df_casted[float_col].astype(float)
+            try:
+                df_casted[float_col] = df_casted[float_col].astype(float)
+            except KeyError:
+                df_casted[float_col] = np.nan
 
         int_cols = [col['column_name'] for col in schema if col['data_type'] == 'INTEGER']
         for int_col in int_cols:
-            df_casted[int_col] = df_casted[int_col].fillna(-1)
-            df_casted[int_col] = df_casted[int_col].astype(int)
+            try:
+                df_casted[int_col] = df_casted[int_col].fillna(-1)
+                df_casted[int_col] = df_casted[int_col].astype(int)
+            except KeyError:
+                df_casted[int_col] = -1
 
         str_cols = [col['column_name'] for col in schema if col['data_type'] == 'STRING']
         for str_col in str_cols:
-            df_casted[str_col] = df_casted[str_col].fillna("")
-            df_casted[str_col] = df_casted[str_col].astype(str)
+            try:
+                df_casted[str_col] = df_casted[str_col].fillna("")
+                df_casted[str_col] = df_casted[str_col].astype(str)
+            except KeyError:
+                df_casted[str_col] = ""
 
         bool_cols = [col['column_name'] for col in schema if col['data_type'] == 'BOOLEAN']
         for bool_col in bool_cols:
-            df_casted[bool_col] = df_casted[bool_col].fillna(False)
-            df_casted[bool_col] = df_casted[bool_col].astype(bool)
+            try:
+                df_casted[bool_col] = df_casted[bool_col].fillna(False)
+                df_casted[bool_col] = df_casted[bool_col].astype(bool)
+            except KeyError:
+                df_casted[bool_col] = ""
 
         # dt_cols = [col['column_name'] for col in schema if col['data_type'] == 'DATETIME']
 
@@ -265,6 +278,29 @@ class ETL():
         #     df_casted[dt_col] = pd.to_datetime(df_casted[dt_col])
 
         return df_casted
+
+    def query_bq(self, query_string):
+
+        query_job = self.bq_client.query(query_string) 
+
+        df = query_job.result().to_dataframe()
+
+        return df
+    
+    def get_latest_date(self, table_id, date_col, date_format = '%Y-%m-%dT%H:%M:%SZ'):
+
+        query_string = f"""
+        SELECT 
+            MAX(PARSE_TIMESTAMP('{date_format}', {date_col})) AS latest_date 
+        FROM 
+            `{table_id}`
+        """
+
+        df = self.query_bq(query_string)
+
+        latest_date = df.loc[0, 'latest_date']
+
+        return latest_date
 
 
     def ingest_data(self, response_json, source_file_name, gcs_bucket_name, gcs_blob_name, bq_table_id, bq_write_disposition = 'WRITE_APPEND', bq_schema = [], set_values = {}, explode_cols = []):
