@@ -1,0 +1,372 @@
+{
+ "ACTIVITIES": {
+  "table_id": "strava-exploration-v2.strava_dev.activities",
+  "write_disposition": "WRITE_TRUNCATE",
+  "schema": [
+   {
+    "column_name": "resource_state",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "name",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "distance",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "moving_time",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "elapsed_time",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "total_elevation_gain",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "type",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "workout_type",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "start_date",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "start_date_local",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "timezone",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "utc_offset",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "location_city",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "location_state",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "location_country",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "achievement_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "kudos_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "comment_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "athlete_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "photo_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "trainer",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "commute",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "manual",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "private",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "visibility",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "flagged",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "gear_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "start_latlng",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "end_latlng",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "average_speed",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "max_speed",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "average_watts",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "kilojoules",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "device_watts",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "has_heartrate",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "average_heartrate",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "max_heartrate",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "heartrate_opt_out",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "display_hide_heartrate_option",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "elev_high",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "elev_low",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "upload_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "upload_id_str",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "external_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "from_accepted_tag",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "pr_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "total_photo_count",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "has_kudoed",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "suffer_score",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "athlete_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "athlete_resource_state",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "map_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "map_summary_polyline",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "map_resource_state",
+    "data_type": "STRING"
+   }
+  ]
+ },
+ "ACTIVITY_LAPS": {
+  "table_id": "strava-exploration-v2.strava_dev.activity_laps",
+  "write_disposition": "WRITE_TRUNCATE",
+  "schema": [
+   {
+    "column_name": "id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "resource_state",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "name",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "elapsed_time",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "moving_time",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "start_date",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "start_date_local",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "distance",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "start_index",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "end_index",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "total_elevation_gain",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "average_speed",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "max_speed",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "device_watts",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "average_watts",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "average_heartrate",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "max_heartrate",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "lap_index",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "split",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "activity_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "activity_resource_state",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "athlete_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "athlete_resource_state",
+    "data_type": "INTEGER"
+   }
+  ]
+ },
+ "ACTIVITY_ZONES": {
+  "table_id": "strava-exploration-v2.strava_dev.activity_zones",
+  "write_disposition": "WRITE_TRUNCATE",
+  "schema": [
+   {
+    "column_name": "score",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "type",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "resource_state",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "sensor_based",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "points",
+    "data_type": "FLOAT"
+   },
+   {
+    "column_name": "custom_zones",
+    "data_type": "BOOLEAN"
+   },
+   {
+    "column_name": "activity_id",
+    "data_type": "STRING"
+   },
+   {
+    "column_name": "min",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "max",
+    "data_type": "INTEGER"
+   },
+   {
+    "column_name": "time",
+    "data_type": "INTEGER"
+   }
+  ]
+ }
+}
