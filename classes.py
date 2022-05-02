@@ -1,3 +1,4 @@
+from unittest import skip
 import requests
 import time
 from datetime import datetime
@@ -5,6 +6,8 @@ from pytz import utc
 import pandas as pd
 import json
 import numpy as np
+import csv
+import os
 
 from google.cloud import storage, bigquery
 
@@ -81,7 +84,7 @@ class StravaAPI():
 
         return print("Access token refreshed \n")
 
-    def get_activities(self, before = current_date_unix, after = 0, page = 1, per_page = 100):
+    def get_activities(self, before = current_date_unix, after = 0, page = 1, per_page = 100, iterate = True):
         
         url = 'https://www.strava.com/api/v3/athlete/activities'
         headers = {'Authorization': f'Bearer {self.access_token}'}
@@ -101,6 +104,9 @@ class StravaAPI():
             activities_page = self.make_request('GET', url = url, headers = headers, params = params)
 
             activities += activities_page
+
+            if not iterate:
+                break
 
             n_results = len(activities_page)
             page += 1
@@ -175,11 +181,36 @@ class ETL():
 
         return print(f"{n_rows} rows outputted to file {file} \n")
 
-    def output_to_csv(self, df, file, index = False):
+    def reorder_csv(self, file, schema):
+
+        temp_file = file.split('.')[0] + '_temp.csv'
+
+        os.rename(file, temp_file)
+
+        with open(temp_file, 'r') as infile, open(file, 'a') as outfile:
+
+            bq_cols = [col['column_name'] for col in schema]
+
+            writer = csv.DictWriter(outfile, fieldnames = bq_cols)
+
+            writer.writeheader()
+
+            for row in csv.DictReader(infile):
+
+                writer.writerow(row)
+        
+        os.remove(temp_file)
+        
+        return print(f'Updated schema for {file} \n')
+
+    def output_to_csv(self, df, file, index = False, schema = []):
 
         n_rows = len(df)
-
+        
         df.to_csv(file, index = index)
+
+        if len(schema) > 0:
+            self.reorder_csv(file, schema)
 
         return print(f"{n_rows} rows outputted to file {file} \n")
 
@@ -192,19 +223,37 @@ class ETL():
 
         return print(f"File {source_file_name} uploaded to {destination_blob_name} \n")
 
-
-    def load_to_bq(self, df, table_id, write_disposition = 'WRITE_APPEND', schema = []):
+    def load_to_bq_from_gcs(self, uri: str, table_id: str, write_disposition = 'WRITE_APPEND', schema = [], skip_leading_rows = 1, allow_jagged_rows = True, source_format = 'CSV'):
 
         schema = [bigquery.SchemaField(col['column_name'], col['data_type']) for col in schema]
 
         job_config = bigquery.LoadJobConfig(
-
             schema = schema,
-
             write_disposition = write_disposition,
+            source_format = source_format,
+            skip_leading_rows = skip_leading_rows,
+            allow_jagged_rows = allow_jagged_rows
+
         )
 
-        load_job = self.bq_client.load_table_from_dataframe(df, table_id, job_config = job_config)  
+        load_job = self.bq_client.load_table_from_uri(uri, table_id, job_config = job_config)  
+
+        load_job.result()  
+
+        n_rows = load_job.output_rows
+
+        return print(f"Loaded {n_rows} rows to {table_id} \n")
+
+    def load_to_bq_from_df(self, df: pd.DataFrame, table_id: str, write_disposition = 'WRITE_APPEND', schema = []):
+
+        schema = [bigquery.SchemaField(col['column_name'], col['data_type']) for col in schema]
+
+        job_config = bigquery.LoadJobConfig(
+            schema = schema,
+            write_disposition = write_disposition
+        )
+
+        load_job = self.bq_client.load_table_from_dataframe(df, table_id, job_config = job_config)
 
         load_job.result()  
 
@@ -272,10 +321,7 @@ class ETL():
             except KeyError:
                 df_casted[bool_col] = ""
 
-        # dt_cols = [col['column_name'] for col in schema if col['data_type'] == 'DATETIME']
-
-        # for dt_col in dt_cols:
-        #     df_casted[dt_col] = pd.to_datetime(df_casted[dt_col])
+        # add datetime 
 
         return df_casted
 
@@ -302,28 +348,35 @@ class ETL():
 
         return latest_date
 
+    def ingest_data(self, response_json, source_file_name, gcs_bucket_name, gcs_blob_name, bq_table_id, bq_job_config = {}, set_values = {}, explode_cols = []):
 
-    def ingest_data(self, response_json, source_file_name, gcs_bucket_name, gcs_blob_name, bq_table_id, bq_write_disposition = 'WRITE_APPEND', bq_schema = [], set_values = {}, explode_cols = []):
+        n_rows = len(response_json)
 
-        # outputting raw api response to json
-        self.output_to_json(response_json, source_file_name)
+        if n_rows > 0:
 
-        # uploading raw data to GCS bucket for debugging
+            # flattening nested response data
+            response_df = self.flatten_data(response_json)
+
+            # setting values for new columns (e.g. last modified timestamp)
+            for key, value in set_values.items():
+                response_df[key] = value
+
+            # exploding keys contain list values
+            for col in explode_cols:
+                response_df = self.explode_data(response_df, col)
+        
+        else:
+
+            response_df = pd.DataFrame()
+
+        # outputting data to csv, with schema constraints
+        self.output_to_csv(response_df, source_file_name, schema = bq_job_config['schema'])
+
+        # uploading data to gcs bucket
         self.upload_to_gcs(source_file_name, gcs_bucket_name, gcs_blob_name)
 
-        # flattening nested response data
-        response_df = self.flatten_data(response_json)
+        # loading data to bq from gcs bucket
+        bq_uri = f'gs://{gcs_bucket_name}/{gcs_blob_name}'
 
-        # setting values for new columns (e.g. last modified timestamp)
-        for key, value in set_values.items():
-            response_df[key] = value
+        self.load_to_bq_from_gcs(bq_uri, bq_table_id, bq_job_config['write_disposition'], bq_job_config['schema'])
 
-        # exploding keys contain list values
-        for col in explode_cols:
-            response_df = self.explode_data(response_df, col)
-        
-        # casting data types in df to match bq schema
-        response_df = self.cast_data_types(response_df, bq_schema)
-
-        # loading (lightly) transformed data into bq
-        self.load_to_bq(response_df, bq_table_id, bq_write_disposition, bq_schema)

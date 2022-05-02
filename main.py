@@ -32,10 +32,7 @@ bq_sa_file = bq_creds['service_account_file']
 
 etl.initiate_bq_client(service_account_file = bq_sa_file)
 
-# - get last modified date -
-
-# start_date = datetime.combine(datetime.now(tz = utc), datetime.min.time()) - timedelta(days = 2)
-# start_date_unix = int(start_date.timestamp())
+# - get current date -
 
 current_date = datetime.now(tz = utc)
 current_date_str = datetime.strftime(current_date, '%Y-%m-%d')
@@ -49,9 +46,11 @@ def main():
 
     # - get activities -
 
-    activities_file = f'activities_{current_date_str}.json'
+    activities_file = f'activities_{current_date_str}.csv'
     activities_file_local = f'data/activities/{activities_file}'
     activities_file_gcs = f'activities/{activities_file}'
+
+    # - get last modified date -
 
     start_date = etl.get_latest_date(bq_config['ACTIVITIES']['table_id'], "start_date")
     start_date_unix = int(start_date.timestamp())
@@ -64,8 +63,10 @@ def main():
         gcs_bucket_name = gcs_bucket,
         gcs_blob_name = activities_file_gcs,
         bq_table_id = bq_config['ACTIVITIES']['table_id'],
-        bq_write_disposition = bq_config['ACTIVITIES']['write_disposition'],
-        bq_schema = bq_config['ACTIVITIES']['schema']
+        bq_job_config = {
+            'write_disposition': bq_config['ACTIVITIES']['write_disposition'],
+            'schema': bq_config['ACTIVITIES']['schema']
+            }
         )
 
     # - loop over activities -
@@ -74,7 +75,7 @@ def main():
     for activity_id in activity_ids:
 
         # - get activity laps -
-        activity_laps_file = f'activity_laps_{activity_id}.json'
+        activity_laps_file = f'activity_laps_{activity_id}.csv'
         activity_laps_file_local = f'data/activity_laps/{activity_laps_file}'
         activities_laps_file_gcs = f'activity_laps/{activity_laps_file}'
 
@@ -87,12 +88,14 @@ def main():
             gcs_bucket_name = gcs_bucket,
             gcs_blob_name = activities_laps_file_gcs,
             bq_table_id = bq_config['ACTIVITY_LAPS']['table_id'],
-            bq_write_disposition = bq_config['ACTIVITY_LAPS']['write_disposition'],
-            bq_schema = bq_config['ACTIVITY_LAPS']['schema']
+            bq_job_config = {
+                'write_disposition': bq_config['ACTIVITY_LAPS']['write_disposition'],
+                'schema': bq_config['ACTIVITY_LAPS']['schema']
+                }
             )
 
         # - get activity zones -
-        activity_zones_file = f'activity_zones_{activity_id}.json'
+        activity_zones_file = f'activity_zones_{activity_id}.csv'
         activity_zones_file_local = f'data/activity_zones/{activity_zones_file}'
         activities_zones_file_gcs = f'activity_zones/{activity_zones_file}'
 
@@ -104,11 +107,17 @@ def main():
             gcs_bucket_name = gcs_bucket,
             gcs_blob_name = activities_zones_file_gcs,
             bq_table_id = bq_config['ACTIVITY_ZONES']['table_id'],
-            bq_write_disposition = bq_config['ACTIVITY_ZONES']['write_disposition'],
-            bq_schema = bq_config['ACTIVITY_ZONES']['schema'],
-            set_values = {'activity_id': activity_id},
+            bq_job_config = {
+                'write_disposition': bq_config['ACTIVITY_ZONES']['write_disposition'],
+                'schema': bq_config['ACTIVITY_ZONES']['schema']
+                },
+            set_values = {
+                'activity_id': activity_id
+                },
             explode_cols = ['distribution_buckets']
             )
 
-main()
+if __name__ == '__main__':
+
+    main()
 

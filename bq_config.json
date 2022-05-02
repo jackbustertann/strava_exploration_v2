@@ -1,7 +1,7 @@
 {
  "ACTIVITIES": {
   "table_id": "strava-exploration-v2.strava_dev.activities",
-  "write_disposition": "WRITE_TRUNCATE",
+  "write_disposition": "WRITE_APPEND",
   "schema": [
    {
     "column_name": "resource_state",
@@ -161,7 +161,7 @@
    },
    {
     "column_name": "heartrate_opt_out",
-    "data_type": "FLOAT"
+    "data_type": "BOOLEAN"
    },
    {
     "column_name": "display_hide_heartrate_option",
@@ -189,7 +189,7 @@
    },
    {
     "column_name": "from_accepted_tag",
-    "data_type": "FLOAT"
+    "data_type": "BOOLEAN"
    },
    {
     "column_name": "pr_count",
@@ -231,7 +231,7 @@
  },
  "ACTIVITY_LAPS": {
   "table_id": "strava-exploration-v2.strava_dev.activity_laps",
-  "write_disposition": "WRITE_TRUNCATE",
+  "write_disposition": "WRITE_APPEND",
   "schema": [
    {
     "column_name": "id",
@@ -315,7 +315,7 @@
    },
    {
     "column_name": "activity_resource_state",
-    "data_type": "INTEGER"
+    "data_type": "STRING"
    },
    {
     "column_name": "athlete_id",
@@ -323,13 +323,23 @@
    },
    {
     "column_name": "athlete_resource_state",
+    "data_type": "STRING"
+   }
+   ,
+   {
+    "column_name": "pace_zone",
     "data_type": "INTEGER"
+   }
+   ,
+   {
+    "column_name": "average_cadence",
+    "data_type": "FLOAT"
    }
   ]
  },
  "ACTIVITY_ZONES": {
   "table_id": "strava-exploration-v2.strava_dev.activity_zones",
-  "write_disposition": "WRITE_TRUNCATE",
+  "write_disposition": "WRITE_APPEND",
   "schema": [
    {
     "column_name": "score",
@@ -361,11 +371,11 @@
    },
    {
     "column_name": "min",
-    "data_type": "INTEGER"
+    "data_type": "FLOAT"
    },
    {
     "column_name": "max",
-    "data_type": "INTEGER"
+    "data_type": "FLOAT"
    },
    {
     "column_name": "time",
