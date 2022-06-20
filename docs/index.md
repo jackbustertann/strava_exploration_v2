@@ -1,5 +1,3 @@
-# Strava Exploration
-
 ## Motivation
 
 To build an automated dashboard using my personal running data to enhance the reporting provided out-of-the-box on the Strava app.
@@ -19,3 +17,7 @@ To build an automated dashboard using my personal running data to enhance the re
   -  Cloud Functions (cloud automation)
 - dbt (data transformation)
 - Streamlit (reporting)
+
+
+
+
