@@ -16,5 +16,5 @@
 
 ## DBT Schema
 
-![dbt schema for strava exploration project in BigQuery](https://github.com/jackbustertann/strava_exploration_v2/blob/main/docs/strava_exploration_dbt_schema.png)
+![](https://github.com/jackbustertann/strava_exploration_v2/blob/main/docs/strava_exploration_dbt_schema.png)
 
