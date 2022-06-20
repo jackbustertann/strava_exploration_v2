@@ -16,5 +16,5 @@
 
 ## DBT Schema
 
-![](strava_exploration_v2/assets/strava_exploration_dbt_schema.png)
+![](assets/strava_exploration_dbt_schema.png)
 
