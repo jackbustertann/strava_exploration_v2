@@ -1,7 +1,3 @@
-## Motivation
-
-To build an automated dashboard using my personal running data to enhance the reporting provided out-of-the-box on the Strava app.
-
 ## Project Plan
 
 1. Use the Strava API to collect my personal running data.
@@ -18,6 +14,7 @@ To build an automated dashboard using my personal running data to enhance the re
 - dbt (data transformation)
 - Streamlit (reporting)
 
+## DBT Schema
 
-
+![Branching](https://github.com/jackbustertann/strava_exploration_v2/blob/main/docs/strava_exploration_dbt_schema.png)
 
