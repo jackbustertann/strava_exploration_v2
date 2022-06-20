@@ -16,5 +16,5 @@
 
 ## DBT Schema
 
-![Branching](https://github.com/jackbustertann/strava_exploration_v2/blob/main/docs/strava_exploration_dbt_schema.png)
+![Octocat](https://github.com/jackbustertann/strava_exploration_v2/blob/main/docs/strava_exploration_dbt_schema.png)
 
