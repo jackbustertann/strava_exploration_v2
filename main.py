@@ -36,6 +36,7 @@ etl.initiate_bq_client(service_account_file = bq_sa_file)
 
 current_date = datetime.now(tz = utc)
 current_date_str = datetime.strftime(current_date, '%Y-%m-%d')
+current_datetime_str = datetime.strftime(current_date, '%Y-%m-%dT%H:%M:%SZ')
 
 def main():
 
@@ -66,6 +67,9 @@ def main():
         bq_job_config = {
             'write_disposition': bq_config['ACTIVITIES']['write_disposition'],
             'schema': bq_config['ACTIVITIES']['schema']
+            },
+        set_values = {
+            'last_updated': current_datetime_str
             }
         )
 
@@ -91,6 +95,9 @@ def main():
             bq_job_config = {
                 'write_disposition': bq_config['ACTIVITY_LAPS']['write_disposition'],
                 'schema': bq_config['ACTIVITY_LAPS']['schema']
+                },
+            set_values = {
+                'last_updated': current_datetime_str
                 }
             )
 
@@ -112,7 +119,8 @@ def main():
                 'schema': bq_config['ACTIVITY_ZONES']['schema']
                 },
             set_values = {
-                'activity_id': activity_id
+                'activity_id': activity_id,
+                'last_updated': current_datetime_str
                 },
             explode_cols = ['distribution_buckets']
             )

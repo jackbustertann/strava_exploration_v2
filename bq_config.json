@@ -1,6 +1,6 @@
 {
  "ACTIVITIES": {
-  "table_id": "strava-exploration-v2.strava_dev.activities",
+  "table_id": "strava-exploration-v2.strava_prod.activities",
   "write_disposition": "WRITE_APPEND",
   "schema": [
    {
@@ -226,11 +226,20 @@
    {
     "column_name": "map_resource_state",
     "data_type": "STRING"
+   },
+   {
+    "column_name": "last_updated",
+    "data_type": "STRING"
+   }
+   ,
+   {
+    "column_name": "sport_type",
+    "data_type": "STRING"
    }
   ]
  },
  "ACTIVITY_LAPS": {
-  "table_id": "strava-exploration-v2.strava_dev.activity_laps",
+  "table_id": "strava-exploration-v2.strava_prod.activity_laps",
   "write_disposition": "WRITE_APPEND",
   "schema": [
    {
@@ -334,11 +343,15 @@
    {
     "column_name": "average_cadence",
     "data_type": "FLOAT"
+   },
+   {
+    "column_name": "last_updated",
+    "data_type": "STRING"
    }
   ]
  },
  "ACTIVITY_ZONES": {
-  "table_id": "strava-exploration-v2.strava_dev.activity_zones",
+  "table_id": "strava-exploration-v2.strava_prod.activity_zones",
   "write_disposition": "WRITE_APPEND",
   "schema": [
    {
@@ -380,6 +393,10 @@
    {
     "column_name": "time",
     "data_type": "INTEGER"
+   },
+   {
+    "column_name": "last_updated",
+    "data_type": "STRING"
    }
   ]
  }
