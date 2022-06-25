@@ -1,0 +1,4 @@
+theme: jekyll-theme-hacker
+title: Strava Exploration Project
+description: Building an automated dashboard using my personal activity data to enhance the reporting provided out-of-the-box on the Strava app.
+baseurl: /strava_exploration_v2
