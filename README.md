@@ -9,6 +9,6 @@ File Structure:
 - **bq_config.json** - configuration file for bq load jobs.
 - **credentials.cfg** - credentials file for third party connectors.
 
-DBT repo: https://github.com/jackbustertann/dbt_bq_strava_exploration_v2
+DBT Schema GitHub Repo: https://github.com/jackbustertann/dbt_bq_strava_exploration_v2
 
-Streamlit App: https://jackbustertann-strava-exploration-streamlit-app-app-xh16o5.streamlitapp.com/
+Streamlit App GitHub Repo: https://github.com/jackbustertann/strava_exploration_streamlit_app
