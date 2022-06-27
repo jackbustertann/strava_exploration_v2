@@ -28,7 +28,9 @@
 - New charts:
   * Time spent in HR zones
   * Race split comparison
+  * Segment / Club Leaderboard
 - New endpoints:
-  * Segments
+  * Activity Segments
   * Activity Streams
+  * Club Activities
 
