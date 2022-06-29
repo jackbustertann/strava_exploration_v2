@@ -1,3 +1,8 @@
+## Motivation 💡
+
+- To apply a modern tech-stack to a end-to-end technical project that I can showecase to future employers.
+- To enhance the reporting provided out-of-the-box by Strava using my own custom dimensions and measures.
+
 ## Project Plan 🤓
 
 1. Use the [Strava API](https://developers.strava.com/docs/reference/) to collect my personal running data. ✅
@@ -26,9 +31,9 @@
 
 - New manual refresh button for streamlit app
 - New charts:
-  * Time spent in HR zones
-  * Race split comparison
-  * Segment / Club Leaderboard
+  * Time spent in HR/pace zones
+  * Activity comparison tool
+  * Segment progress tracker
 - New endpoints:
   * Activity Segments
   * Activity Streams
