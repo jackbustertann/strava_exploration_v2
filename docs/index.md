@@ -7,7 +7,7 @@
 
 1. Use the [Strava API](https://developers.strava.com/docs/reference/) to collect my personal running data. ✅
 2. Use a data warehousing platform to store and transform the data. ✅
-3. Use a browser-based reporting tool to vizualise the data. ✅
+3. Use a browser-based reporting tool to vizualise the data. 🚧 
 4. Use cloud automation to refresh the data daily. 🚧 
 
 ## Tech Stack 👨‍💻
@@ -31,7 +31,6 @@
 
 - New manual refresh button for streamlit app
 - New charts:
-  * Time spent in HR/pace zones
   * Activity comparison tool
   * Segment progress tracker
 - New endpoints:
