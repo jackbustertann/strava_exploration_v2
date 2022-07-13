@@ -18,6 +18,7 @@
   -  Cloud Functions (cloud automation) 🚧 
 - dbt (data transformation) ✅
 - Streamlit (reporting) ✅
+- Docker (containerisation) 🚧 
 
 ## [DBT Schema](https://github.com/jackbustertann/dbt_bq_strava_exploration_v2) 🗄️
 
