@@ -1,0 +1,32 @@
+name: test-pipeline
+on: 
+  push:
+    branches:
+      - github_actions_test
+jobs:
+  test-ci-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch to runner
+        uses: actions/checkout@v3
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check if specific script needs linting
+        run: black classes_new.py --check
+
+      - name: Check changes made to specific script after linting
+        run: black classes_new.py --diff
+
+      - name: Apply linting to specific script
+        run: black classes_new.py 
+
+      - name: Apply unit tests to specific class
+        run: pytest tests/test_api.py
