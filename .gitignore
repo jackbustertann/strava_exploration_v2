@@ -1,5 +1,5 @@
 # Test data
-/data
+*.csv
 
 # Credentials
 *credentials.cfg
