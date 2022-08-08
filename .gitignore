@@ -1,9 +1,8 @@
 # Test data
 *.csv
 
-# Credentials
-*credentials.cfg
-*service_account.json
+# Config files
+/config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

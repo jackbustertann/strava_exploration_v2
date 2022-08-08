@@ -3,14 +3,26 @@ from datetime import datetime, timedelta
 from pytz import utc
 import json
 import pandas as pd
+import os
 
 from classes import StravaAPI, ETL
+
+# - getting gcp env -
+
+# export GCP_ENV={prod/dev}
+
+gcp_env = os.environ.get('GCP_ENV')
+
+if gcp_env is None:
+    gcp_env = 'dev'
+
+print(f'Running script in GCP environment: {gcp_env}')
 
 # - refresh access token -
 
 config = configparser.ConfigParser()
 
-config.read('credentials.cfg')
+config.read(f'config/{gcp_env}/credentials.cfg')
 
 api_creds = config['STRAVA_API_V3']
 
@@ -38,11 +50,12 @@ current_date = datetime.now(tz = utc)
 current_date_str = datetime.strftime(current_date, '%Y-%m-%d')
 current_datetime_str = datetime.strftime(current_date, '%Y-%m-%dT%H:%M:%SZ')
 
+
 def main():
 
     # - get bq table configs -
 
-    with open('bq_config.json', 'r') as f:
+    with open(f'config/{gcp_env}/bq_config.json', 'r') as f:
         bq_config = json.load(f)
 
     # - get activities -

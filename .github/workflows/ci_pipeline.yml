@@ -1,4 +1,4 @@
-name: test-pipeline
+name: ci-pipeline
 on: 
   push:
     branches:
@@ -19,14 +19,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check if specific script needs linting
-        run: black classes_new.py --check
+      - name: Check changes made to python scripts after linting
+        run: black *.py --diff
 
-      - name: Check changes made to specific script after linting
-        run: black classes_new.py --diff
+      - name: Apply linting to python scripts
+        run: black *.py 
 
-      - name: Apply linting to specific script
-        run: black classes_new.py 
-
-      - name: Apply unit tests to specific class
-        run: pytest tests/test_api.py -v --cov
+      - name: Apply unit tests to classes
+        run: pytest tests/*.py -v --cov --cov-branch --cov-report term-missing
