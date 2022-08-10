@@ -1,8 +1,7 @@
 name: ci-pipeline
 on: 
-  push:
-    branches:
-      - github_actions_test
+  - push
+
 jobs:
   test-ci-job:
     runs-on: ubuntu-latest
@@ -19,11 +18,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check changes made to python scripts after linting
-        run: black *.py --diff
+      - name: Apply unit tests to classes
+        run: pytest tests/*.py -v --cov
 
       - name: Apply linting to python scripts
         run: black *.py 
-
-      - name: Apply unit tests to classes
-        run: pytest tests/*.py -v --cov --cov-branch --cov-report term-missing

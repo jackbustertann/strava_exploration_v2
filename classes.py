@@ -84,17 +84,7 @@ class API:
             # if success, output reponse body
             if r_json.status_code == requests.codes.ok:
 
-                try:
-
-                    r_body = r_json.json()
-
-                except BaseException: # pragma: no cover
-
-                    e_msg = f"{r_type.upper()} request to endpoint {r_json.url} returned no results"
-
-                    print(e_msg)
-
-                    return {}
+                r_body = json.loads(r_json.text)
 
                 return r_body
 
@@ -142,6 +132,8 @@ class StravaAPI(API):
 
     def refresh_access_token(self):
 
+        # test: check if access token is in response keys
+
         url = 'https://www.strava.com/api/v3/oauth/token'
         data = {
         'client_id': self.client_id,
@@ -159,6 +151,10 @@ class StravaAPI(API):
 
     def get_activities(self, before = current_date_unix, after = 0, page = 1, per_page = 100, iterate = True) -> list:
         
+        # test: check if date range is valid
+        # test: check zero data range case
+        # test: check if output keys
+
         url = 'https://www.strava.com/api/v3/athlete/activities'
         headers = {'Authorization': f'Bearer {self.access_token}'}
 
@@ -188,6 +184,8 @@ class StravaAPI(API):
 
     def get_activity_laps(self, activity_id: str) -> dict:
 
+        # test: check output keys
+
         url = f'https://www.strava.com/api/v3/activities/{activity_id}/laps'
         headers = {'Authorization': f'Bearer {self.access_token}'}
 
@@ -196,6 +194,8 @@ class StravaAPI(API):
         return activity_laps
 
     def get_activity_zones(self, activity_id: str) -> dict:
+
+        # test: check output keys
         
         url = f'https://www.strava.com/api/v3/activities/{activity_id}/zones'
         headers = {'Authorization': f'Bearer {self.access_token}'}
@@ -208,11 +208,15 @@ class GoogleCloudPlatform:
 
     def initiate_gcs_client(self, service_account_file):
 
+        # test: check service account file contains correct keys
+
         self.gcs_client = storage.Client.from_service_account_json(service_account_file)
 
         return print('Google Cloud Storage client initiated! \n')
 
     def initiate_bq_client(self, service_account_file):
+
+        # test: check service account file contains correct keys
 
         self.bq_client = bigquery.Client.from_service_account_json(service_account_file)
 
@@ -228,6 +232,10 @@ class GoogleCloudPlatform:
         return print(f"File {source_file_name} uploaded to {destination_blob_name} \n")
 
     def load_to_bq_from_gcs(self, uri: str, table_id: str, write_disposition = 'WRITE_APPEND', schema = [], skip_leading_rows = 1, allow_jagged_rows = True, source_format = 'CSV'):
+
+        # test: check uri is correct format
+        # test: check write disposition is accepted value
+        # test: check schema contains correct keys
 
         schema = [bigquery.SchemaField(col['column_name'], col['data_type']) for col in schema]
 
@@ -275,6 +283,9 @@ class GoogleCloudPlatform:
 
     def get_latest_date(self, table_id, date_col, date_format = '%Y-%m-%dT%H:%M:%SZ'):
 
+        # test: check if output dataframe contains latest date column
+        # test: check if latest date column is correct format
+
         query_string = f"""
         SELECT 
             MAX(PARSE_TIMESTAMP('{date_format}', {date_col})) AS latest_date 
@@ -292,11 +303,15 @@ class Process:
 
     def flatten_data(self, response_json):
 
+        # test: check specific case
+
         response_df = pd.json_normalize(response_json, sep = '_')
 
         return response_df
 
     def explode_data(self, df, col):
+
+        # test: check specific case
 
         # creating a copy of data for processing
         df_raw = df.copy()
@@ -365,6 +380,9 @@ class ETL(Process, Extract, Load):
 
     def process_data(self, response_json, set_values = {}, explode_cols = []):
 
+        # test: check specific cases (one for each opt param)
+        # test: check empty df case
+
         n_rows = len(response_json)
 
         if n_rows > 0:
@@ -376,7 +394,7 @@ class ETL(Process, Extract, Load):
             for key, value in set_values.items():
                 response_df[key] = value
 
-            # exploding keys that contain list values
+            # exploding keys that contain a list of dicts
             for col in explode_cols:
                 response_df = self.explode_data(response_df, col)
         
@@ -394,7 +412,7 @@ class ETL(Process, Extract, Load):
         # uploading data to gcs bucket
         self.upload_to_gcs(source_file_name, gcs_bucket_name, gcs_blob_name)
 
-    def load_data(self, gcs_bucket_name, gcs_blob_name, bq_table_id, bq_job_config):
+    def load_data(self, gcs_bucket_name, gcs_blob_name, bq_table_id, bq_job_config): 
 
         # loading data to bq from gcs bucket
         bq_uri = f'gs://{gcs_bucket_name}/{gcs_blob_name}'

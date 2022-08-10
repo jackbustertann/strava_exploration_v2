@@ -11,10 +11,11 @@ from classes import StravaAPI, ETL
 
 # export GCP_ENV={prod/dev}
 
-gcp_env = os.environ.get('GCP_ENV')
+gcp_env = input("GCP environment: (dev)/prod ") or 'dev'
 
-if gcp_env is None:
-    gcp_env = 'dev'
+if gcp_env not in ('dev', 'prod'):
+    e_msg = f"GCP environment: {gcp_env} not in (dev, prod)"
+    raise Exception(e_msg)
 
 print(f'Running script in GCP environment: {gcp_env}')
 
