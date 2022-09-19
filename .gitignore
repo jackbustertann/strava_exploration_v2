@@ -1,8 +1,8 @@
 # Test data
 *.csv
 
-# Service Accounts
-*.json
+# Secret files
+.secret
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
