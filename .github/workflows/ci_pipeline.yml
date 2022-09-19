@@ -1,25 +1,25 @@
-name: ci-pipeline
-on: 
-  - push
+# name: ci-pipeline
+# on: 
+#   - push
 
-jobs:
-  test-ci-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout branch to runner
-        uses: actions/checkout@v3
+# jobs:
+#   unit-tests-and-linting:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout branch to runner
+#         uses: actions/checkout@v3
 
-      - name: Install python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-          architecture: 'x64'
+#       - name: Install python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.x'
+#           architecture: 'x64'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: pip install -r requirements.txt
 
-      - name: Apply unit tests to classes
-        run: pytest tests/*.py -v --cov
+#       - name: Apply linting to all python scripts
+#         run: black *.py 
 
-      - name: Apply linting to python scripts
-        run: black *.py 
+#       - name: Apply unit tests to classes
+#         run: pytest tests/*.py -v --cov
