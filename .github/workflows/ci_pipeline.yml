@@ -41,7 +41,7 @@ jobs:
       with:
         component: patch
     - name: Output new version
-    - run: echo ${{ steps.bump.outputs.newVersion }}
+      run: echo ${{ steps.bump.outputs.newVersion }}
 
 # - install python + dependencies
 # - lint + clean files
