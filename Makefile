@@ -57,25 +57,3 @@ docker-prod-run: activate-venv
 
 unit-tests:
 	@pytest tests -v --cov -W ignore::DeprecationWarning
-
-
-# check-release-version:
-# PROJECT_VERSION=$(yq '.version' settings.yml)
-# echo $PYTHON_VERSION
-
-# update-release-version:
-# PROJECT_VERSION=$(expr $PROJECT_VERSION + 1)
-# echo $PROJECT_VERSION
-# yq -i -y '.version = '$PROJECT_VERSION'' settings.yml
-
-# check-branch-name
-
-# pr
-# check-branch-name
-# activate-venv
-# unit-tests
-# clean
-# docker-staging-run
-# docker-clean
-# update-release-version
-

@@ -23,3 +23,33 @@
 
 #       - name: Apply unit tests to classes
 #         run: pytest tests/*.py -v --cov
+
+# ci pipeline (on push)
+name: cd-pipeline
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Bump project version
+      uses: fwilhe2/bump-version@main
+      id: bump
+      with:
+        component: patch
+    - name: Output new version
+    - run: echo ${{ steps.bump.outputs.newVersion }}
+
+# - install python + dependencies
+# - lint + clean files
+# - run unit tests
+
+# cd pipeline (on merge)
+# - get project version
+# - extract bump size from branch name
+# - tag docker image with new version
+# - build docker image 
+# - push docker image to remote repo
