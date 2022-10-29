@@ -7,14 +7,15 @@ import pytest
 import requests_mock
 import os, sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from classes import API
+from src.extract.api import API
 
-mock_base_url = 'https://mock.codes/'
+mock_base_url = "https://mock.codes/"
 real_http = False
 
 api = API()
+
 
 class TestRequest:
     """Test assertions about {request} function"""
@@ -29,24 +30,21 @@ class TestRequest:
 
         with requests_mock.Mocker(real_http=real_http) as m:
 
-            m.request(r_type, url, status_code = status_code)
+            m.request(r_type, url, status_code=status_code)
 
             with pytest.raises(Exception) as e:
                 assert api.request(r_type, url)
-            assert (
-                str(e.value)
-                == f"Request type {r_type} not in (GET, POST)"
-            )      
+            assert str(e.value) == f"Request type {r_type} not in (GET, POST)"
 
     @pytest.mark.parametrize("status_code", [401, 403, 404, 500])
     def test_bad_request(self, status_code):
         """Test status codes which should throw exception without retry"""
-        
+
         with requests_mock.Mocker(real_http=real_http) as m:
 
             url = f"{mock_base_url}/{status_code}"
 
-            m.request('GET', url, status_code = status_code)
+            m.request("GET", url, status_code=status_code)
 
             with pytest.raises(Exception) as e:
                 assert api.request("GET", url)
@@ -65,7 +63,7 @@ class TestRequest:
 
         with requests_mock.Mocker(real_http=real_http) as m:
 
-            m.request('GET', url, status_code = status_code)
+            m.request("GET", url, status_code=status_code)
 
             with pytest.raises(Exception) as e:
                 assert api.request("GET", url, max_retries=max_retries)
@@ -82,14 +80,8 @@ class TestRequest:
 
         with requests_mock.Mocker(real_http=real_http) as m:
 
-            m.request('GET', url, status_code = status_code, text = text)
+            m.request("GET", url, status_code=status_code, text=text)
 
-            response = api.request('GET', url)
+            response = api.request("GET", url)
 
         assert response["statusCode"] == status_code
-
-            
-
-
-
-
