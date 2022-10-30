@@ -43,40 +43,39 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: actions-ecosystem/action-release-label@v1
+        id: release-label
+        if: ${{ steps.get-merged-pull-request.outputs.title != null }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ${{ steps.get-merged-pull-request.outputs.labels }}
+
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+        if: ${{ steps.release-label.outputs.level != null }}
+        with:
+          semver_only: true
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        if: ${{ steps.release-label.outputs.level != null }}
+        with:
+          current_version: ${{ steps.get-latest-tag.outputs.tag }}
+          level: ${{ steps.get-merged-pull-request.outputs.labels }}
+
       - name: test echo
         shell: bash
         run: |
-          echo "PR_TITLE: $PR_TITLE"
-          echo "PR_BODY: $PR_BODY"
-          echo "PR_NUMBER: $PR_NUMBER"
-          echo "PR_LABELS: $PR_LABELS"
-          echo "PR_ASSIGNEES: $PR_ASSIGNEES"
+          echo "Creating a $PR_LABELS release"
+          echo "Bumping github version from $CURRENT_VERSION to $NEW_VERSION"
         env:
           PR_TITLE: ${{ steps.get-merged-pull-request.outputs.title }}
           PR_BODY: ${{ steps.get-merged-pull-request.outputs.body }}
           PR_NUMBER: ${{ steps.get-merged-pull-request.outputs.number }}
           PR_LABELS: ${{ steps.get-merged-pull-request.outputs.labels }}
           PR_ASSIGNEES: ${{ steps.get-merged-pull-request.outputs.assignees }}
-
-      # - uses: actions-ecosystem/action-release-label@v1
-      #   id: release-label
-      #   if: ${{ steps.get-merged-pull-request.outputs.title != null }}
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     labels: ${{ steps.get-merged-pull-request.outputs.labels }}
-
-      # - uses: actions-ecosystem/action-get-latest-tag@v1
-      #   id: get-latest-tag
-      #   if: ${{ steps.release-label.outputs.level != null }}
-      #   with:
-      #     semver_only: true
-
-      # - uses: actions-ecosystem/action-bump-semver@v1
-      #   id: bump-semver
-      #   if: ${{ steps.release-label.outputs.level != null }}
-      #   with:
-      #     current_version: ${{ steps.get-latest-tag.outputs.tag }}
-      #     level: ${{ steps.release-label.outputs.level }}
+          CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
+          NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
 
       # - uses: actions-ecosystem/action-regex-match@v2
       #   id: regex-match
