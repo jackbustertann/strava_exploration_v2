@@ -30,7 +30,7 @@ name: Github Release
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   release:
