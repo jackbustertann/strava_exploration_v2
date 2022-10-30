@@ -10,41 +10,37 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout branch to runner
+        uses: actions/checkout@v2
 
-      - uses: actions-ecosystem/action-get-merged-pull-request@v1
+      - name: get PR params
+        uses: actions-ecosystem/action-get-merged-pull-request@v1
         id: get-merged-pull-request
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: test echo
+      - name: check label
         shell: bash
         if: ${{ steps.get-merged-pull-request.outputs.labels == null }}
         run: |
           echo "no release label provided!"
           exit 1
 
-      - uses: actions-ecosystem/action-release-label@v1
-        id: release-label
-        if: ${{ steps.get-merged-pull-request.outputs.title != null }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: ${{ steps.get-merged-pull-request.outputs.labels }}
-
-      - uses: actions-ecosystem/action-get-latest-tag@v1
+      - name: get latest github release tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag
-        if: ${{ steps.release-label.outputs.level != null }}
         with:
           semver_only: true
 
-      - uses: actions-ecosystem/action-bump-semver@v1
+      - name: bump github release tag
+        uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
         if: ${{ steps.release-label.outputs.level != null }}
         with:
           current_version: ${{ steps.get-latest-tag.outputs.tag }}
           level: ${{ steps.get-merged-pull-request.outputs.labels }}
 
-      - name: test echo
+      - name: echo version bump
         shell: bash
         run: |
           echo "Bumping github version from $CURRENT_VERSION to $NEW_VERSION"
@@ -52,13 +48,15 @@ jobs:
           CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
           NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
 
-      - uses: actions-ecosystem/action-push-tag@v1
+      - name: push new github release tag
+        uses: actions-ecosystem/action-push-tag@v1
         if: ${{ steps.bump-semver.outputs.new_version != null }}
         with:
           tag: ${{ steps.bump-semver.outputs.new_version }}
           message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
 
-      - uses: actions/create-release@v1
+      - name: create new github release
+        uses: actions/create-release@v1
         if: ${{ steps.release-label.outputs.level == 'major' || steps.release-label.outputs.level == 'minor' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,7 +65,8 @@ jobs:
           release_name: ${{ steps.bump-semver.outputs.new_version }}
           body: ${{ steps.regex-match.outputs.group1 }}
 
-      - uses: actions-ecosystem/action-create-comment@v1
+      - name: echo success message
+        uses: actions-ecosystem/action-create-comment@v1
         if: ${{ steps.bump-semver.outputs.new_version != null }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -8,22 +8,22 @@ jobs:
   unit-tests-and-linting:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch to runner
+      - name: checkout branch to runner
         uses: actions/checkout@v3
 
-      - name: Install python
+      - name: install python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
           architecture: 'x64'
 
-      - name: Install dependencies
+      - name: install dependencies
         run: pip install -r requirements.txt
 
-      - name: Apply linting to all python scripts
+      - name: apply linting to all python scripts
         run: black src/*.py 
 
-      - name: Apply unit tests to classes
+      - name: apply unit tests
         run: pytest tests -v --cov -W ignore::DeprecationWarning
 
 # ci pipeline (on push to master)
