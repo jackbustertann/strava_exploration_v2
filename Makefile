@@ -2,7 +2,8 @@
 
 include .env
 
-# PROJECT_VERSION := $(shell yq '.version' settings.yml)
+PROJECT_VERSION := $(shell yq '.version' version.yml)
+NEW_PROJECT_VERSION := $(shell expr $(PROJECT_VERSION) + 1)
 
 clean-files:
 	@echo "removing cache files"
@@ -57,3 +58,25 @@ docker-prod-run: activate-venv
 
 unit-tests:
 	@pytest tests -v --cov -W ignore::DeprecationWarning
+
+check-branch-name:
+	@export branch_name=$(git symbolic-ref --short HEAD)
+	@echo $(branch_name)
+ifneq (,$(findstring patch, $(branch_name)))
+	@echo "patch release"
+else ifneq (,$(findstring minor, $(branch_name)))
+	@echo "minor release"
+else ifneq (,$(findstring major, $(branch_name)))
+	@echo "major release"
+else
+	@echo "invalid branch name"
+endif
+
+check-release-version:
+	@echo "The current release version is: $(PROJECT_VERSION)"
+
+update-release-version: check-release-version
+	@echo "The new release version is: $(NEW_PROJECT_VERSION)"
+	@yq -i -y '.version = '$(NEW_PROJECT_VERSION)'' version.yml
+
+
