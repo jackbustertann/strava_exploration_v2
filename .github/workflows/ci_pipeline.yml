@@ -43,20 +43,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: check for valid {patch/minor/major} label
-        if: ${{ steps.get-merged-pull-request.outputs.labels != "patch" & steps.get-merged-pull-request.outputs.labels != "minor" & steps.get-merged-pull-request.outputs.labels != "major" }}
-        run: |
-          echo "PR label: $(PR_LABELS) is not equal to {patch/minor/major}"
-          exit 1
-        env:
-          PR_TITLE: ${{ steps.get-merged-pull-request.outputs.title }}
-          PR_BODY: ${{ steps.get-merged-pull-request.outputs.body }}
-          PR_NUMBER: ${{ steps.get-merged-pull-request.outputs.number }}
-          PR_LABELS: ${{ steps.get-merged-pull-request.outputs.labels }}
-          PR_ASSIGNEES: ${{ steps.get-merged-pull-request.outputs.assignees }}
-          CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
-          NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
-
       - uses: actions-ecosystem/action-release-label@v1
         id: release-label
         if: ${{ steps.get-merged-pull-request.outputs.title != null }}
@@ -91,28 +77,28 @@ jobs:
           CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
           NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
 
-      # - uses: actions-ecosystem/action-push-tag@v1
-      #   if: ${{ steps.bump-semver.outputs.new_version != null }}
-      #   with:
-      #     tag: ${{ steps.bump-semver.outputs.new_version }}
-      #     message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
+      - uses: actions-ecosystem/action-push-tag@v1
+        if: ${{ steps.bump-semver.outputs.new_version != null }}
+        with:
+          tag: ${{ steps.bump-semver.outputs.new_version }}
+          message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
 
-      # - uses: actions/create-release@v1
-      #   if: ${{ steps.release-label.outputs.level == 'major' || steps.release-label.outputs.level == 'minor' }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: ${{ steps.bump-semver.outputs.new_version }}
-      #     release_name: ${{ steps.bump-semver.outputs.new_version }}
-      #     body: ${{ steps.regex-match.outputs.group1 }}
+      - uses: actions/create-release@v1
+        if: ${{ steps.release-label.outputs.level == 'major' || steps.release-label.outputs.level == 'minor' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump-semver.outputs.new_version }}
+          release_name: ${{ steps.bump-semver.outputs.new_version }}
+          body: ${{ steps.regex-match.outputs.group1 }}
 
-      # - uses: actions-ecosystem/action-create-comment@v1
-      #   if: ${{ steps.bump-semver.outputs.new_version != null }}
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     number: ${{ steps.get-merged-pull-request.outputs.number }}
-      #     body: |
-      #       The new version [${{ steps.bump-semver.outputs.new_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bump-semver.outputs.new_version }}) has been released :tada:
+      - uses: actions-ecosystem/action-create-comment@v1
+        if: ${{ steps.bump-semver.outputs.new_version != null }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.get-merged-pull-request.outputs.number }}
+          body: |
+            The new version [${{ steps.bump-semver.outputs.new_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bump-semver.outputs.new_version }}) has been released :tada:
 
 # ci pipeline (on push)
 # - install python + dependencies
