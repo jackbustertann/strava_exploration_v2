@@ -25,12 +25,12 @@
 #         run: pytest tests/*.py -v --cov
 
 # ci pipeline (on push)
-name: Push a new tag with minor update
+name: Create Release
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   release:
@@ -38,28 +38,85 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get-latest-tag
-
-      - uses: actions-ecosystem/action-bump-semver@v1
-        id: bump-semver
+      - uses: actions-ecosystem/action-get-merged-pull-request@v1
+        id: get-merged-pull-request
         with:
-          current_version: ${{ steps.get-latest-tag.outputs.tag }}
-          level: minor
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions-ecosystem/action-push-tag@v1
-        with:
-          tag: ${{ steps.bump-semver.outputs.new_version }}
-          message: '${{ steps.bump-semver.outputs.new_version }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}'
+      - name: test echo
+        shell: bash
+        run: |
+          echo "PR_TITLE: $PR_TITLE"
+          echo "PR_BODY: $PR_BODY"
+          echo "PR_NUMBER: $PR_NUMBER"
+          echo "PR_LABELS: $PR_LABELS"
+          echo "PR_ASSIGNEES: $PR_ASSIGNEES"
+        env:
+          PR_TITLE: ${{ steps.get-merged-pull-request.outputs.title }}
+          PR_BODY: ${{ steps.get-merged-pull-request.outputs.body }}
+          PR_NUMBER: ${{ steps.get-merged-pull-request.outputs.number }}
+          PR_LABELS: ${{ steps.get-merged-pull-request.outputs.labels }}
+          PR_ASSIGNEES: ${{ steps.get-merged-pull-request.outputs.assignees }}
 
+      # - uses: actions-ecosystem/action-release-label@v1
+      #   id: release-label
+      #   if: ${{ steps.get-merged-pull-request.outputs.title != null }}
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     labels: ${{ steps.get-merged-pull-request.outputs.labels }}
+
+      # - uses: actions-ecosystem/action-get-latest-tag@v1
+      #   id: get-latest-tag
+      #   if: ${{ steps.release-label.outputs.level != null }}
+      #   with:
+      #     semver_only: true
+
+      # - uses: actions-ecosystem/action-bump-semver@v1
+      #   id: bump-semver
+      #   if: ${{ steps.release-label.outputs.level != null }}
+      #   with:
+      #     current_version: ${{ steps.get-latest-tag.outputs.tag }}
+      #     level: ${{ steps.release-label.outputs.level }}
+
+      # - uses: actions-ecosystem/action-regex-match@v2
+      #   id: regex-match
+      #   if: ${{ steps.bump-semver.outputs.new_version != null }}
+      #   with:
+      #     text: ${{ steps.get-merged-pull-request.outputs.body }}
+      #     regex: '```release_note([\s\S]*)```'
+
+      # - uses: actions-ecosystem/action-push-tag@v1
+      #   if: ${{ steps.bump-semver.outputs.new_version != null }}
+      #   with:
+      #     tag: ${{ steps.bump-semver.outputs.new_version }}
+      #     message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
+
+      # - uses: actions/create-release@v1
+      #   if: ${{ steps.release-label.outputs.level == 'major' || steps.release-label.outputs.level == 'minor' }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ steps.bump-semver.outputs.new_version }}
+      #     release_name: ${{ steps.bump-semver.outputs.new_version }}
+      #     body: ${{ steps.regex-match.outputs.group1 }}
+
+      # - uses: actions-ecosystem/action-create-comment@v1
+      #   if: ${{ steps.bump-semver.outputs.new_version != null }}
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     number: ${{ steps.get-merged-pull-request.outputs.number }}
+      #     body: |
+      #       The new version [${{ steps.bump-semver.outputs.new_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bump-semver.outputs.new_version }}) has been released :tada:
+
+# ci pipeline (on push)
 # - install python + dependencies
 # - lint + clean files
 # - run unit tests
 
-# cd pipeline (on merge)
-# - get project version from github
+# cd pipeline (on merge to master)
+# - get project version from github *
 # - extract bump size from branch name {patch/minor/major}
-# - bump project version
+# - bump project version *
+# - create new release in github *
 # - build + tag docker image with new version
 # - push docker image to remote repo
-# - create new release in github
