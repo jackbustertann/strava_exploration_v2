@@ -57,13 +57,12 @@ jobs:
 
       - name: create new github release
         uses: actions/create-release@v1
-        if: ${{ steps.release-label.outputs.level == 'major' || steps.release-label.outputs.level == 'minor' }}
+        if: ${{ steps.bump-semver.outputs.new_version != null }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.bump-semver.outputs.new_version }}
           release_name: ${{ steps.bump-semver.outputs.new_version }}
-          body: ${{ steps.regex-match.outputs.group1 }}
 
       - name: echo success message
         uses: actions-ecosystem/action-create-comment@v1
