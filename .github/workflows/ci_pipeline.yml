@@ -1,114 +1,32 @@
-# name: ci-pipeline
-# on: 
-#   - push
-
-# jobs:
-#   unit-tests-and-linting:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout branch to runner
-#         uses: actions/checkout@v3
-
-#       - name: Install python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.x'
-#           architecture: 'x64'
-
-#       - name: Install dependencies
-#         run: pip install -r requirements.txt
-
-#       - name: Apply linting to all python scripts
-#         run: black *.py 
-
-#       - name: Apply unit tests to classes
-#         run: pytest tests/*.py -v --cov
-
-# ci pipeline (on push)
-name: Github Release
-
-on:
+name: ci-pipeline
+on: 
   push:
-    branches:
+    branches-ignore:
       - master
 
 jobs:
-  release:
+  unit-tests-and-linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout branch to runner
+        uses: actions/checkout@v3
 
-      - uses: actions-ecosystem/action-get-merged-pull-request@v1
-        id: get-merged-pull-request
+      - name: Install python
+        uses: actions/setup-python@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.x'
+          architecture: 'x64'
 
-      - uses: actions-ecosystem/action-release-label@v1
-        id: release-label
-        if: ${{ steps.get-merged-pull-request.outputs.title != null }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: ${{ steps.get-merged-pull-request.outputs.labels }}
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get-latest-tag
-        if: ${{ steps.release-label.outputs.level != null }}
-        with:
-          semver_only: true
+      - name: Apply linting to all python scripts
+        run: black src/*.py 
 
-      - uses: actions-ecosystem/action-bump-semver@v1
-        id: bump-semver
-        if: ${{ steps.release-label.outputs.level != null }}
-        with:
-          current_version: ${{ steps.get-latest-tag.outputs.tag }}
-          level: ${{ steps.get-merged-pull-request.outputs.labels }}
+      - name: Apply unit tests to classes
+        run: pytest tests -v --cov -W ignore::DeprecationWarning
 
-      - name: test echo
-        shell: bash
-        run: |
-          echo "Creating a $PR_LABELS release"
-          echo "Bumping github version from $CURRENT_VERSION to $NEW_VERSION"
-        env:
-          PR_TITLE: ${{ steps.get-merged-pull-request.outputs.title }}
-          PR_BODY: ${{ steps.get-merged-pull-request.outputs.body }}
-          PR_NUMBER: ${{ steps.get-merged-pull-request.outputs.number }}
-          PR_LABELS: ${{ steps.get-merged-pull-request.outputs.labels }}
-          PR_ASSIGNEES: ${{ steps.get-merged-pull-request.outputs.assignees }}
-          CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
-          NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
-
-      - uses: actions-ecosystem/action-push-tag@v1
-        if: ${{ steps.bump-semver.outputs.new_version != null }}
-        with:
-          tag: ${{ steps.bump-semver.outputs.new_version }}
-          message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
-
-      - uses: actions/create-release@v1
-        if: ${{ steps.release-label.outputs.level == 'major' || steps.release-label.outputs.level == 'minor' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.bump-semver.outputs.new_version }}
-          release_name: ${{ steps.bump-semver.outputs.new_version }}
-          body: ${{ steps.regex-match.outputs.group1 }}
-
-      - uses: actions-ecosystem/action-create-comment@v1
-        if: ${{ steps.bump-semver.outputs.new_version != null }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ steps.get-merged-pull-request.outputs.number }}
-          body: |
-            The new version [${{ steps.bump-semver.outputs.new_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bump-semver.outputs.new_version }}) has been released :tada:
-
-# ci pipeline (on push)
-# - install python + dependencies
-# - lint + clean files
-# - run unit tests
-
-# cd pipeline (on merge to master)
-# - get project version from github *
-# - extract bump size from branch name {patch/minor/major}
-# - bump project version *
-# - create new release in github *
-# - build + tag docker image with new version
-# - push docker image to remote repo
+# ci pipeline (on push to master)
+# - install python + dependencies *
+# - lint + clean files *
+# - run unit tests *
