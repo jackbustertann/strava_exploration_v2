@@ -1,11 +1,11 @@
-name: ci-pipeline
+name: test
 on: 
   push:
-    branches-ignore:
+    branches:
       - master
 
 jobs:
-  unit-tests-and-linting:
+  test-job:
     runs-on: ubuntu-latest
     steps:
     - id: 'auth'
