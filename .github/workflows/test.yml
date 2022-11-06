@@ -27,5 +27,5 @@ jobs:
       
     - name: Build & Push
       run: |
-        docker build . -f Dockerfile -t gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1 .
+        docker build . --file Dockerfile --tag gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
         docker push gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
