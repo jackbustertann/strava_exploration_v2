@@ -23,6 +23,7 @@ jobs:
     - name: Configure Docker
       run: |
         gcloud auth configure-docker
+        ls -a
       
     - name: Build & Push
       run: |
