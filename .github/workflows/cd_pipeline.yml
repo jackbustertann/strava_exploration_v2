@@ -1,86 +1,126 @@
-# # ci pipeline (on push to master)
-# name: cd-pipeline
+name: cd-pipeline
 
-# on:
-#   push:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
 
-# jobs:
-#   release:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Branch
-#         uses: actions/checkout@v2
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
 
-#       - name: Get PR Params
-#         uses: actions-ecosystem/action-get-merged-pull-request@v1
-#         id: get-merged-pull-request
-#         with:
-#           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout Branch
+        uses: actions/checkout@v2
 
-#       - name: Check PR Label
-#         shell: bash
-#         if: ${{ steps.get-merged-pull-request.outputs.labels == null }}
-#         run: |
-#           echo "no release label provided!"
-#           exit 1
+      - name: Get PR Params
+        uses: actions-ecosystem/action-get-merged-pull-request@v1
+        id: get-merged-pull-request
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-#       - name: Get Latest GitHub Release Tag
-#         uses: actions-ecosystem/action-get-latest-tag@v1
-#         id: get-latest-tag
-#         with:
-#           semver_only: true
+      - name: Check PR Label
+        shell: bash
+        if: ${{ steps.get-merged-pull-request.outputs.labels == null }}
+        run: |
+          echo "no release label provided!"
+          exit 1
 
-#       - name: Bump GitHub Release Tag
-#         uses: actions-ecosystem/action-bump-semver@v1
-#         id: bump-semver
-#         if: ${{ steps.get-latest-tag.outputs.tag != null }}
-#         with:
-#           current_version: ${{ steps.get-latest-tag.outputs.tag }}
-#           level: ${{ steps.get-merged-pull-request.outputs.labels }}
+      - name: Get Latest GitHub Release Tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+        with:
+          semver_only: true
 
-#       - name: Echo Version Bump
-#         shell: bash
-#         run: |
-#           echo "Bumping github version from $CURRENT_VERSION to $NEW_VERSION"
-#         env:
-#           CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
-#           NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
+      - name: Bump GitHub Release Tag
+        uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        if: ${{ steps.get-latest-tag.outputs.tag != null }}
+        with:
+          current_version: ${{ steps.get-latest-tag.outputs.tag }}
+          level: ${{ steps.get-merged-pull-request.outputs.labels }}
 
-#       - name: Push New Github Release Tag
-#         uses: actions-ecosystem/action-push-tag@v1
-#         if: ${{ steps.bump-semver.outputs.new_version != null }}
-#         with:
-#           tag: ${{ steps.bump-semver.outputs.new_version }}
-#           message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
+      - name: Echo Version Bump
+        shell: bash
+        run: |
+          echo "Bumping github version from $CURRENT_VERSION to $NEW_VERSION"
+        env:
+          CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
+          NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
 
-#       - name: Create New GitHub Release
-#         uses: actions/create-release@v1
-#         if: ${{ steps.bump-semver.outputs.new_version != null }}
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           tag_name: ${{ steps.bump-semver.outputs.new_version }}
-#           release_name: ${{ steps.bump-semver.outputs.new_version }}
+      - name: Push New Github Release Tag
+        uses: actions-ecosystem/action-push-tag@v1
+        if: ${{ steps.bump-semver.outputs.new_version != null }}
+        with:
+          tag: ${{ steps.bump-semver.outputs.new_version }}
+          message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
 
-#       - name: Echo Release Success Message
-#         uses: actions-ecosystem/action-create-comment@v1
-#         if: ${{ steps.bump-semver.outputs.new_version != null }}
-#         with:
-#           github_token: ${{ secrets.GITHUB_TOKEN }}
-#           number: ${{ steps.get-merged-pull-request.outputs.number }}
-#           body: |
-#             The new version [${{ steps.bump-semver.outputs.new_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bump-semver.outputs.new_version }}) has been released :tada:
+      - name: Create New GitHub Release
+        uses: actions/create-release@v1
+        if: ${{ steps.bump-semver.outputs.new_version != null }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump-semver.outputs.new_version }}
+          release_name: ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Echo Release Success Message
+        uses: actions-ecosystem/action-create-comment@v1
+        if: ${{ steps.bump-semver.outputs.new_version != null }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.get-merged-pull-request.outputs.number }}
+          body: |
+            The new version [${{ steps.bump-semver.outputs.new_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bump-semver.outputs.new_version }}) has been released :tada:
+
+  build_tag_and_push:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Branch
+        uses: actions/checkout@v2
+
+      - name: Authenticate with GCP
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set-up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker
+
+      - name: Get Latest GitHub Release Tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+        with:
+          semver_only: true
+        
+      - name: Build, Tag & Push
+        shell: bash
+        run: |
+          docker build . --file Dockerfile --tag gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION
+          docker push gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION
+        env:
+          CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          CONTAINER_NAME: ${{ secrets.GCP_CONTAINER_NAME }}
 
 # cd pipeline (on push to master)
+
+# 1) release
 # - get project version from github *
 # - extract bump size from PR tag *
 # - bump project version *
 # - create new release in github *
-# - build + tag docker image with new version
-# - push docker image to remote repo
-# - deploy docker image to cloud run
 
-# open questions
-# - should I build or release first?
+# 2) build, tag & push
+# - build + tag docker image with new version *
+# - push docker image to remote repo *
+
+# 3) deploy
+# - deploy docker image to cloud run
