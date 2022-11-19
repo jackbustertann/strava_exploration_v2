@@ -10,29 +10,29 @@
 #   release:
 #     runs-on: ubuntu-latest
 #     steps:
-#       - name: checkout branch to runner
+#       - name: Checkout Branch
 #         uses: actions/checkout@v2
 
-#       - name: get PR params
+#       - name: Get PR Params
 #         uses: actions-ecosystem/action-get-merged-pull-request@v1
 #         id: get-merged-pull-request
 #         with:
 #           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-#       - name: check label
+#       - name: Check PR Label
 #         shell: bash
 #         if: ${{ steps.get-merged-pull-request.outputs.labels == null }}
 #         run: |
 #           echo "no release label provided!"
 #           exit 1
 
-#       - name: get latest github release tag
+#       - name: Get Latest GitHub Release Tag
 #         uses: actions-ecosystem/action-get-latest-tag@v1
 #         id: get-latest-tag
 #         with:
 #           semver_only: true
 
-#       - name: bump github release tag
+#       - name: Bump GitHub Release Tag
 #         uses: actions-ecosystem/action-bump-semver@v1
 #         id: bump-semver
 #         if: ${{ steps.get-latest-tag.outputs.tag != null }}
@@ -40,7 +40,7 @@
 #           current_version: ${{ steps.get-latest-tag.outputs.tag }}
 #           level: ${{ steps.get-merged-pull-request.outputs.labels }}
 
-#       - name: echo version bump
+#       - name: Echo Version Bump
 #         shell: bash
 #         run: |
 #           echo "Bumping github version from $CURRENT_VERSION to $NEW_VERSION"
@@ -48,14 +48,14 @@
 #           CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
 #           NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
 
-#       - name: push new github release tag
+#       - name: Push New Github Release Tag
 #         uses: actions-ecosystem/action-push-tag@v1
 #         if: ${{ steps.bump-semver.outputs.new_version != null }}
 #         with:
 #           tag: ${{ steps.bump-semver.outputs.new_version }}
 #           message: "${{ steps.bump-semver.outputs.new_version }}: PR #${{ steps.get-merged-pull-request.outputs.number }} ${{ steps.get-merged-pull-request.outputs.title }}"
 
-#       - name: create new github release
+#       - name: Create New GitHub Release
 #         uses: actions/create-release@v1
 #         if: ${{ steps.bump-semver.outputs.new_version != null }}
 #         env:
@@ -64,7 +64,7 @@
 #           tag_name: ${{ steps.bump-semver.outputs.new_version }}
 #           release_name: ${{ steps.bump-semver.outputs.new_version }}
 
-#       - name: echo success message
+#       - name: Echo Release Success Message
 #         uses: actions-ecosystem/action-create-comment@v1
 #         if: ${{ steps.bump-semver.outputs.new_version != null }}
 #         with:
@@ -80,3 +80,7 @@
 # - create new release in github *
 # - build + tag docker image with new version
 # - push docker image to remote repo
+# - deploy docker image to cloud run
+
+# open questions
+# - should I build or release first?

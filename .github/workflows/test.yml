@@ -1,4 +1,4 @@
-name: test
+name: Build, Tag & Push
 on: 
   push:
     branches:
@@ -8,26 +8,37 @@ jobs:
   test-job:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout branch to runner
+    - name: Checkout Branch
       uses: actions/checkout@v2
-    - id: auth
-      uses: google-github-actions/auth@v0
+
+    # - name: Authenticate with GCP
+    #   id: auth
+    #   uses: google-github-actions/auth@v0
+    #   with:
+    #     credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+    # - name: Set-up Google Cloud SDK
+    #   uses: google-github-actions/setup-gcloud@v0
+
+    # - name: Configure Docker
+    #   run: |
+    #     gcloud auth configure-docker
+
+    - name: Get Latest GitHub Release Tag
+      uses: actions-ecosystem/action-get-latest-tag@v1
+      id: get-latest-tag
       with:
-        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+        semver_only: true
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0
-
-    - name: Get Info
+    - name: Echo New Docker Image Name + Tag
+      shell: bash
       run: |
-        gcloud info
-
-    - name: Configure Docker
-      run: |
-        gcloud auth configure-docker
-        ls -a
+        echo "Image Name: gcr.io/strava-exploration-v2/strava-exploration-v2"
+        echo "Image Tag: $CURRENT_VERSION"
+      env:
+        CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
       
-    - name: Build & Push
-      run: |
-        docker build . --file Dockerfile --tag gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
-        docker push gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
+    # - name: Build & Push
+    #   run: |
+    #     docker build . --file Dockerfile --tag gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
+    #     docker push gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
