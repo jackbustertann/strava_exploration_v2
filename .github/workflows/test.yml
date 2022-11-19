@@ -30,15 +30,19 @@ jobs:
       with:
         semver_only: true
 
-    - name: Echo New Docker Image Name + Tag
+    - name: Echo New Docker Image Name, with Tag
       shell: bash
       run: |
-        echo "Image Name: gcr.io/strava-exploration-v2/strava-exploration-v2"
-        echo "Image Tag: $CURRENT_VERSION"
+        echo "Image Name, with Tag: gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION"
       env:
         CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
+        PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        CONTAINER_NAME: ${{ secrets.GCP_CONTAINER_NAME }}
       
-    # - name: Build & Push
+    # - name: Build, Tag & Push
+    #   shell: bash
     #   run: |
-    #     docker build . --file Dockerfile --tag gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
-    #     docker push gcr.io/strava-exploration-v2/strava-exploration-v2:v0.2.1
+    #     docker build . --file Dockerfile --tag gcr.io/strava-exploration-v2/strava-exploration-v2:$CURRENT_VERSION
+    #     docker push gcr.io/strava-exploration-v2/strava-exploration-v2:$CURRENT_VERSION
+    #   env:
+    #     CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
