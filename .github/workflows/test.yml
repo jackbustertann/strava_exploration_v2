@@ -11,18 +11,18 @@ jobs:
     - name: Checkout Branch
       uses: actions/checkout@v2
 
-    # - name: Authenticate with GCP
-    #   id: auth
-    #   uses: google-github-actions/auth@v0
-    #   with:
-    #     credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+    - name: Authenticate with GCP
+      id: auth
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-    # - name: Set-up Google Cloud SDK
-    #   uses: google-github-actions/setup-gcloud@v0
+    - name: Set-up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
 
-    # - name: Configure Docker
-    #   run: |
-    #     gcloud auth configure-docker
+    - name: Configure Docker
+      run: |
+        gcloud auth configure-docker
 
     - name: Get Latest GitHub Release Tag
       uses: actions-ecosystem/action-get-latest-tag@v1
@@ -39,10 +39,12 @@ jobs:
         PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         CONTAINER_NAME: ${{ secrets.GCP_CONTAINER_NAME }}
       
-    # - name: Build, Tag & Push
-    #   shell: bash
-    #   run: |
-    #     docker build . --file Dockerfile --tag gcr.io/strava-exploration-v2/strava-exploration-v2:$CURRENT_VERSION
-    #     docker push gcr.io/strava-exploration-v2/strava-exploration-v2:$CURRENT_VERSION
-    #   env:
-    #     CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
+    - name: Build, Tag & Push
+      shell: bash
+      run: |
+        docker build . --file Dockerfile --tag gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION
+        docker push gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION
+      env:
+        CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
+        PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        CONTAINER_NAME: ${{ secrets.GCP_CONTAINER_NAME }}
