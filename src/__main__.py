@@ -6,6 +6,7 @@ from src.extract.dates import Dates
 from src.extract.api import StravaAPI
 from src.etl import ETL
 from pprint import pprint
+import json
 
 # - storing env variables -
 
@@ -18,7 +19,7 @@ api_keys = ["CLIENT_ID", "CLIENT_SECRET", "ACCESS_TOKEN", "REFRESH_TOKEN"]
 STRAVA_API = {k.lower(): config(f"STRAVA_API__{k}") for k in api_keys}
 
 GCP_ENV = "gcp_prod" if PROD_RUN else "gcp_dev"
-GCP_SERVICE_ACCOUNT = config("GCP__SERVICE_ACCOUNT_FILE")
+GCP_CREDENTIALS = json.loads(config("GCP_CREDENTIALS", cast=str))
 
 # - storing settings -
 
@@ -36,9 +37,9 @@ pprint(settings[GCP_ENV])
 
 # - connecting to GCP clients -
 
-gcs = GoogleCloudStorage(f"{GCP_SERVICE_ACCOUNT}")
+gcs = GoogleCloudStorage(GCP_CREDENTIALS)
 
-gbq = GoogleBigQuery(f"{GCP_SERVICE_ACCOUNT}")
+gbq = GoogleBigQuery(GCP_CREDENTIALS)
 
 # - Strava API authentication -
 
