@@ -1,10 +1,15 @@
 from google.cloud import storage, bigquery
+from google.oauth2 import service_account
 import pandas as pd
 
 class GoogleCloudStorage:
 
-    def __init__(self, service_account_file):
-        self.gcs_client = storage.Client.from_service_account_json(service_account_file)
+    # def __init__(self, service_account_file):
+    #     self.gcs_client = storage.Client.from_service_account_json(service_account_file)
+
+    def __init__(self, credentials_dict):
+        credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+        self.gcs_client = storage.Client(project='strava-exploration-v2', credentials=credentials)
 
     def generate_file_locations(self, endpoint, suffix):
 
@@ -33,8 +38,12 @@ class GoogleCloudStorage:
 
 class GoogleBigQuery:
 
-    def __init__(self, service_account_file):
-        self.gbq_client = bigquery.Client.from_service_account_json(service_account_file)
+    # def __init__(self, service_account_file):
+    #     self.gbq_client = bigquery.Client.from_service_account_json(service_account_file)
+
+    def __init__(self, credentials_dict):
+        credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+        self.gbq_client = bigquery.Client(project='strava-exploration-v2', credentials=credentials)
 
     def load_to_gbq_from_gcs(self, uri: str, table_id: str, write_disposition = 'WRITE_APPEND', schema = [], skip_leading_rows = 1, allow_jagged_rows = True, source_format = 'CSV'):
 
