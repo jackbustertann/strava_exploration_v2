@@ -9,6 +9,7 @@ clean-files:
 
 update-requirements:
 	@echo "updating requirements.txt"
+	@pipenv lock
 	@pipenv requirements > requirements.txt
 
 lint-files:
