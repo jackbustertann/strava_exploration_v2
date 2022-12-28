@@ -1,32 +1,32 @@
-# name: ci-pipeline
-# on: 
-#   push:
-#     branches-ignore:
-#       - master
+name: ci-pipeline
+on: 
+  push:
+    branches-ignore:
+      - master
 
-# jobs:
-#   unit-tests-and-linting:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: checkout branch to runner
-#         uses: actions/checkout@v3
+jobs:
+  unit-tests-and-linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout branch to runner
+        uses: actions/checkout@v3
 
-#       - name: install python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.x'
-#           architecture: 'x64'
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
 
-#       - name: install dependencies
-#         run: pip install -r requirements.txt
+      - name: install dependencies
+        run: pip install -r requirements.txt
 
-#       - name: apply linting to all python scripts
-#         run: black src/*.py 
+      - name: apply linting to all python scripts
+        run: black src/*.py 
 
-#       - name: apply unit tests
-#         run: pytest tests -v --cov -W ignore::DeprecationWarning
+      - name: apply unit tests
+        run: pytest tests -v --cov -W ignore::DeprecationWarning
 
 # ci pipeline (on push to master)
-# - install python + dependencies *
-# - lint + clean files *
-# - run unit tests *
+# - install python + dependencies 
+# - lint + clean files 
+# - run unit tests 

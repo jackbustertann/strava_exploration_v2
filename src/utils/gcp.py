@@ -4,9 +4,6 @@ import pandas as pd
 
 class GoogleCloudStorage:
 
-    # def __init__(self, service_account_file):
-    #     self.gcs_client = storage.Client.from_service_account_json(service_account_file)
-
     def __init__(self, credentials_dict):
         credentials = service_account.Credentials.from_service_account_info(credentials_dict)
         self.gcs_client = storage.Client(project='strava-exploration-v2', credentials=credentials)
@@ -37,9 +34,6 @@ class GoogleCloudStorage:
 
 
 class GoogleBigQuery:
-
-    # def __init__(self, service_account_file):
-    #     self.gbq_client = bigquery.Client.from_service_account_json(service_account_file)
 
     def __init__(self, credentials_dict):
         credentials = service_account.Credentials.from_service_account_info(credentials_dict)

@@ -120,8 +120,6 @@ tables:
         type: FLOAT
       - name: average_cadence
         type: FLOAT
-      - name: average_watts
-        type: FLOAT
       - name: kilojoules
         type: FLOAT
       - name: device_watts
@@ -174,6 +172,8 @@ tables:
         type: FLOAT
       - name: map
         type: STRING
+      - name: average_watts
+        type: FLOAT
       - name: weighted_average_watts
         type: FLOAT
       - name: max_watts
