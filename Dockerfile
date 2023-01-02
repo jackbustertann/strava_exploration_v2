@@ -1,5 +1,5 @@
-# installing python v3.8
-FROM python:3.8-slim-buster
+# installing python v3.9
+FROM python:3.9-slim-buster
 
 # setting working directory
 WORKDIR /
@@ -10,6 +10,7 @@ RUN pip3 install -r requirements.txt
 
 # add source code
 COPY . .
+ENV PORT 8080
 
 # run python module
 CMD [ "python3", "-m", "src"]

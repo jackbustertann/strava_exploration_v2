@@ -112,15 +112,12 @@ jobs:
 
 # cd pipeline (on push to master)
 
-# 1) release
-# - get project version from github *
-# - extract bump size from PR tag *
-# - bump project version *
-# - create new release in github *
+# 1) release 
+# - get project version from github 
+# - extract bump size from PR tag 
+# - bump project version 
+# - create new release in github 
 
-# 2) build, tag & push
-# - build + tag docker image with new version *
-# - push docker image to remote repo *
-
-# 3) deploy
-# - deploy docker image to cloud run
+# 2) build, tag & push 
+# - build + tag docker image with new version 
+# - push docker image to remote repo 
