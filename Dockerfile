@@ -1,5 +1,5 @@
-# installing python v3.8
-FROM python:3.8-slim-buster
+# installing python v3.9
+FROM python:3.9-slim-buster
 
 # setting working directory
 WORKDIR /
