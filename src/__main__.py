@@ -111,6 +111,23 @@ def ingest_data():
             activity_id=activity_id,
         )
 
+        # - get activity streams data - 
+        try:
+            activity_streams_json = strava_api.get_activity_streams(activity_id)
+
+        except:
+            print(
+                f"Streaming data doesn't exist for {activity_id}"
+            )
+            continue
+
+        etl.run_strava_ingest(
+            response_json=activity_streams_json,
+            endpoint="activity_streams",
+            last_updated=dt.current_date_str,
+            activity_id=activity_id,
+        )
+
     return "--- SUCCESS --- \n"
 
 
@@ -119,3 +136,10 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=int(os.environ.get("PORT", 8080)),
     )
+
+# TODO: add backfill strategies
+# - between two dates
+# - not in activities
+
+# TODO: configure endpoints on/off
+# TODO: exception handling for 404 error

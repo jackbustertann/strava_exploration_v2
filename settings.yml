@@ -6,6 +6,7 @@ gcp_prod:
       - activities
       - activity_laps
       - activity_zones
+      - activity_streams
   gbq:
     schema: strava_prod
     tables:
@@ -15,6 +16,8 @@ gcp_prod:
         write-disposition: WRITE_APPEND
       activity_zones:
         write-disposition: WRITE_APPEND
+      activity_streams:
+        write-disposition: WRITE_APPEND
 gcp_dev:
   project: strava-exploration-v2
   gcs:
@@ -23,6 +26,7 @@ gcp_dev:
       - activities
       - activity_laps
       - activity_zones
+      - activity_streams
   gbq:
     schema: strava_dev
     tables:
@@ -32,25 +36,42 @@ gcp_dev:
         write-disposition: WRITE_TRUNCATE
       activity_zones:
         write-disposition: WRITE_TRUNCATE
+      activity_streams:
+        write-disposition: WRITE_TRUNCATE
 etl:
   activities:
     file_suffix: last_updated
     transform:
-      set_values:
+      explode_dict_keys: True
+      set_value_columns:
         - last_updated
   activity_laps:
     file_suffix: activity_id
     transform:
-      set_values:
+      explode_dict_keys: True
+      set_value_columns:
         - last_updated
   activity_zones:
     file_suffix: activity_id
     transform:
-      set_values:
+      explode_list_keys:
+        type: "list_key_into_rows"
+        list_key: "distribution_buckets"
+      explode_dict_keys: True
+      set_value_columns:
         - last_updated
         - activity_id
-      explode_cols:
-        - distribution_buckets
+  activity_streams:
+    file_suffix: activity_id
+    transform:
+      explode_list_keys:
+        type: "list_key_into_columns"
+        column_key: "type"
+        list_key: "data"
+      explode_dict_keys: False
+      set_value_columns:
+        - last_updated
+        - activity_id
 tables:
   activities:
     columns:
@@ -232,6 +253,8 @@ tables:
         type: FLOAT
       - name: last_updated
         type: STRING
+      - name: activity_visibility
+        type: STRING
   activity_zones:
     columns:
       - name: score
@@ -248,11 +271,39 @@ tables:
         type: BOOLEAN
       - name: activity_id
         type: STRING
-      - name: min
+      - name: distribution_buckets_min
         type: FLOAT
-      - name: max
+      - name: distribution_buckets_max
+        type: FLOAT
+      - name: distribution_buckets_time
+        type: INTEGER
+      - name: last_updated
+        type: STRING
+  activity_streams:
+    columns:
+      - name: temp
+        type: INTEGER
+      - name: watts
+        type: FLOAT
+      - name: moving
+        type: BOOLEAN
+      - name: latlng
+        type: STRING
+      - name: velocity_smooth
+        type: FLOAT
+      - name: grade_smooth
+        type: FLOAT
+      - name: cadence
+        type: INTEGER
+      - name: distance
+        type: FLOAT
+      - name: heartrate
+        type: INTEGER
+      - name: altitude
         type: FLOAT
       - name: time
         type: INTEGER
       - name: last_updated
+        type: STRING
+      - name: activity_id
         type: STRING

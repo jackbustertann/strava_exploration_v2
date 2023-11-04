@@ -1,5 +1,9 @@
 # Test data
 *.csv
+data/
+
+# Python notebooks
+*.ipynb
 
 # Secret files
 .secret

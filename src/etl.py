@@ -1,5 +1,5 @@
 import pandas as pd
-from src.transform.json import flatten_data, explode_data
+from src.transform.json import transform_response_json
 from src.utils.files import output_to_csv
 
 
@@ -28,32 +28,6 @@ class ETL:
 
         # uploading data to gcs bucket
         gcs_obj.upload_to_gcs(source_file_name, gcs_bucket_name, gcs_blob_name)
-
-    def run_transform(self, response_json, set_values={}, explode_cols=[]):
-
-        # test: check specific cases (one for each opt param)
-        # test: check empty df case
-
-        n_rows = len(response_json)
-
-        if n_rows > 0:
-
-            # flattening nested response data
-            response_df = flatten_data(response_json)
-
-            # setting values for new columns (e.g. last modified timestamp)
-            for key, value in set_values.items():
-                response_df[key] = value
-
-            # exploding keys that contain a list of dicts
-            for col in explode_cols:
-                response_df = explode_data(response_df, col)
-
-        else:
-
-            response_df = pd.DataFrame()
-
-        return response_df
 
     def run_load(
         self,
@@ -87,10 +61,11 @@ class ETL:
         - transform_args: Dict[str, Any]
         """
 
-        response_df = self.run_transform(
+        response_df = transform_response_json(
             response_json,
+            explode_list_keys=transform_args.get("explode_list_keys", {}),
+            explode_dict_keys=transform_args.get("explode_dict_keys", False),
             set_values=transform_args.get("set_values", {}),
-            explode_cols=transform_args.get("explode_cols", []),
         )
 
         self.run_upload(
@@ -141,14 +116,14 @@ class ETL:
 
         transform_settings = self.settings["etl"][endpoint]["transform"]
 
-        assert "set_values" in transform_settings.keys()
-
         transform_args = {
-            "set_values": {k: kwargs[k] for k in transform_settings["set_values"]}
+            k: v for k, v in transform_settings.items() 
+            if k in ["explode_list_keys", "explode_dict_keys"]
         }
 
-        if "explode_cols" in transform_settings.keys():
-            transform_args["explode_cols"] = transform_settings["explode_cols"]
+        transform_args["set_values"] = {
+            k: kwargs[k] for k in transform_settings["set_value_columns"]
+        }
 
         self.run_ingest(
             response_json,
