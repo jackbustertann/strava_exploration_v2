@@ -230,3 +230,19 @@ class StravaAPI(API):
         activity_zones = self.request('GET', url = url, headers = headers)
 
         return activity_zones
+
+    def get_activity_streams(self, activity_id: str) -> dict:
+
+        # test: check output keys
+        
+        url = f'{self.base_url}/activities/{activity_id}/streams'
+
+        headers = {'Authorization': f'Bearer {self.access_token}'}
+
+        stream_keys_str = 'time,distance,latlng,altitude,velocity_smooth,heartrate,cadence,watts,temp,moving,grade_smooth'
+
+        params = {'keys': stream_keys_str}
+
+        activity_streams =  self.request('GET', url = url, headers = headers, params=params)
+
+        return activity_streams
