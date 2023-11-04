@@ -1,5 +1,6 @@
 # Test data
 *.csv
+*.json
 
 # Python notebooks
 *.ipynb
