@@ -2,17 +2,17 @@
 
 - To get hands-on exposure to a modern ELT tech-stack that incorperates dbt and a cloud platform.
 - To enhance the reporting provided out-of-the-box by Strava.
-  - Filter and group my activities using my own custom activity types.
-  - Track my training volume and load across multiple sports in one consolidated view.
-  - Aggregrate the time I spend in different HR and pace zones over time.
-  - Benchmark my performance over time for specific races and training segments.
+  - Create a 90-day view to benchmark different aspects of my training, such as volume, intensity and performance.
+  - Create my own activity types, such as intervals (road/track/virtual) and races (road/XC/virtual), to filter and group my activities.
+  - Define my own sport-specific metrics such as best power efforts (cycling) and time in pace zones (running).
+  - Aggregate my activity metrics across multiple sports into one consolidated view.
 
 ## Project Plan 🤓
 
 1. Use the [Strava API](https://developers.strava.com/docs/reference/) to collect my personal running data. ✅
 2. Use a cloud-based data warehousing platform to store the data. ✅
-3. Use DBT to test, transform and document the data. ✅
-4. Use CI/CD to automate the developement flow. ✅
+3. Use DBT to transform, test and document the data. ✅
+4. Use CI/CD to automate the deployment flow. ✅
 5. Use cloud automation to refresh the data daily. ✅
 6. Use a browser-based reporting tool to vizualise the data. 🚧 
 
@@ -30,31 +30,34 @@
 - dbt
 - Streamlit 
 
-## Data Pipeline 
+## Data Pipeline
 
 ![](assets/Strava%20Exploration%20v2%20-%20Data%20Pipeline.png)
+
+TODO: add activity streams endpoint
 
 ## CI/CD 
 
 ![](assets/Strava%20Exploration%20-%20CI_CD.png)
 
-## [DBT Schema](https://github.com/jackbustertann/dbt_bq_strava_exploration_v2) 🗄️
+## [DBT Lineage](https://github.com/jackbustertann/dbt_bq_strava_exploration_v2) 🗄️
 
-![](assets/strava_exploration_dbt_schema.png)
+![](assets/strava_exploration_dbt_lineage.png)
 
-## Next Steps 🚀
+## Future Optimisations 🚀
 
-- Improve reliability of data pipeline
-  - Write unit tests for all modules
-  - Write data quality tests for all tables
-  - Add logging to code
-- Improve usefulness of reporting 
-  - Collect data from new API endpoints
-    - Training segments
-    - Activity streaming
-    - Club activities
-  - Create new data models in dbt
-  - Create new pages in Streamlit app
-- Improve scalability of GCP infrastructure
-  - Manage infrastructure as code using Terraform
+- In-corperate activity streams data source into data model. ✅
+  - Define custom HR, power and pace zones that update dynamically over time.
+    - HR -> age
+    - power -> FTP
+    - pace -> 5k race times
+  - Calculate time in HR, power and pace zones.
+  - Calculate best 15", 1', 5', 10' and 20' power efforts.
+- Extend DBT functionality across project.
+  - Re-factor code using jinja and macros. ✅
+  - Reduce build time using incremental models. ✅
+  - Define re-usable and consistent metrics using the MetricFlow.
+  - Detect data quality and source freshness issues using tests.
+- Manage cloud infrastructure as code using Terraform.
+- Manage data injestion pipelines in Airflow.
 
