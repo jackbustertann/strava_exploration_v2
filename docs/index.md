@@ -58,6 +58,7 @@ TODO: add activity streams endpoint
   - Reduce build time using incremental models. ✅
   - Define re-usable and consistent metrics using the MetricFlow.
   - Detect data quality and source freshness issues using tests.
+- Trigger DBT refresh job on detection of file.
 - Manage cloud infrastructure as code using Terraform.
-- Manage data injestion pipelines in Airflow.
+- Manage/Schedule data injestion pipelines in Airflow.
 
