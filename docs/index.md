@@ -44,6 +44,12 @@ TODO: add activity streams endpoint
 
 ![](assets/strava_exploration_dbt_lineage.png)
 
+## [Steamlit Web App](https://jackbustertann-strava-exploration-streamlit-app-app-xh16o5.streamlit.app/)
+
+<img width="392" alt="Screenshot 2024-03-10 at 16 09 04" src="https://github.com/jackbustertann/strava_exploration_v2/assets/42582606/2ccf3d75-8d76-43ef-87a9-c761efeb5b59">
+
+
+
 ## Future Optimisations 🚀
 
 - In-corperate activity streams data source into data model. ✅
