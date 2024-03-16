@@ -46,7 +46,9 @@ TODO: add activity streams endpoint
 
 ## [Steamlit Web App](https://jackbustertann-strava-exploration-streamlit-app-app-xh16o5.streamlit.app/)
 
-<img width="392" alt="Screenshot 2024-03-10 at 16 09 04" src="https://github.com/jackbustertann/strava_exploration_v2/assets/42582606/2ccf3d75-8d76-43ef-87a9-c761efeb5b59">
+<img width="400" alt="Screenshot 2024-03-16 at 18 49 26" src="https://github.com/jackbustertann/strava_exploration_v2/assets/42582606/16341951-ccfb-4bb1-b43a-82962494f0df">
+
+<img width="398" alt="Screenshot 2024-03-16 at 18 49 59" src="https://github.com/jackbustertann/strava_exploration_v2/assets/42582606/5bef1bf4-3bca-48bd-89ed-4e797d845c79">
 
 
 
