@@ -1,11 +1,10 @@
 ## Motivation 💡
 
-- To get hands-on exposure to a modern ELT tech-stack that incorperates dbt and a cloud platform.
+- To get hands-on experience working with a modern ELT tech-stack that incorperates dbt and a cloud platform.
 - To enhance the reporting provided out-of-the-box by Strava.
-  - Create a 90-day view to benchmark different aspects of my training, such as volume, intensity and performance.
-  - Create my own activity types, such as intervals (road/track/virtual) and races (road/XC/virtual), to filter and group my activities.
-  - Define my own sport-specific metrics such as best power efforts (cycling) and time in pace zones (running).
-  - Aggregate my activity metrics across multiple sports into one consolidated view.
+  - Define my own sport-specific metrics to benchmark different aspects of my training (i.e. volume, intensity and performance).
+  - Aggregate my activity metrics across multiple sports and custom training periods (e.g. 6w, 13w, 26w, 52w).
+  - Create my own custom activity types, such as intervals (road/track/virtual) and races (road/XC/virtual), to filter and group my activities.
 
 ## Project Plan 🤓
 
@@ -66,7 +65,7 @@ TODO: add activity streams endpoint
   - Reduce build time using incremental models. ✅
   - Define re-usable and consistent metrics using the MetricFlow.
   - Detect data quality and source freshness issues using tests.
-- Trigger DBT refresh job on detection of file.
+- Trigger DBT refresh job via API.
 - Manage cloud infrastructure as code using Terraform.
-- Manage/Schedule data injestion pipelines in Airflow.
+- Orchestrate data injestion pipelines in Airflow.
 
