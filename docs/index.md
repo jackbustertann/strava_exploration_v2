@@ -61,11 +61,12 @@ TODO: add activity streams endpoint
   - Calculate time in HR, power and pace zones.
   - Calculate best 15", 1', 5', 10' and 20' power efforts.
 - Extend DBT functionality across project.
-  - Re-factor code using jinja and macros. ✅
-  - Reduce build time using incremental models. ✅
-  - Define re-usable and consistent metrics using the MetricFlow.
-  - Detect data quality and source freshness issues using tests.
-- Trigger DBT refresh job via API.
-- Manage cloud infrastructure as code using Terraform.
-- Orchestrate data injestion pipelines in Airflow.
+  - Use Jinja, Macros & Packages to re-factor code.
+  - Use advanced materialisation types to optimise build/query time.
+  - Use data quality tests to improve data integrity + source freshness.
+  - Use the semantic layer to build consistent and flexible mertics.
+- Migrate DWH from BigQuery to Snowfake.
+  - Use snowpipe to load data directly from GCS bucket on event.
+  - Apply data modelling best practices.
+- Create activity-level views in Streamlit app.
 
