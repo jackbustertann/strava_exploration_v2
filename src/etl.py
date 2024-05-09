@@ -1,6 +1,6 @@
 import pandas as pd
 from src.transform.json import transform_response_json
-from src.utils.files import output_to_csv
+from src.utils.files import output_to_csv, output_to_json
 
 
 class ETL:
@@ -10,7 +10,7 @@ class ETL:
         self.settings = settings
         self.gcp_env = gcp_env
         self.gcp_project = settings[gcp_env]["project"]
-        self.gbq_bucket_name = settings[gcp_env]["gcs"]["bucket"]
+        self.gcs_bucket_name = settings[gcp_env]["gcs"]["bucket"]
         self.gbq_schema_name = settings[gcp_env]["gbq"]["schema"]
 
     def run_upload(
@@ -20,11 +20,21 @@ class ETL:
         source_file_name,
         gcs_bucket_name,
         gcs_blob_name,
-        gbq_schema,
+        gbq_schema = {},
+        file_format = "json"
     ):
 
         # outputting data to csv, with schema constraints
-        output_to_csv(response_df, source_file_name, schema=gbq_schema)
+        if file_format == "csv":
+            output_to_csv(response_df, source_file_name, schema=gbq_schema)
+        
+        elif file_format == "json":
+            output_to_json(response_df, source_file_name)
+        
+        else:
+            raise AssertionError(
+                f"Un-supported file_format {file_format} for run_upload"
+            )
 
         # uploading data to gcs bucket
         gcs_obj.upload_to_gcs(source_file_name, gcs_bucket_name, gcs_blob_name)
@@ -47,7 +57,7 @@ class ETL:
         )
 
     def run_ingest(
-        self, response_json, gcs_obj, gcs_args, gbq_obj, gbq_args, transform_args
+        self, response_json, gcs_obj, gcs_args, gbq_obj, gbq_args, transform_args, file_format="csv"
     ):
         """Transform raw Strava API response, upload to GCS and load to GBQ
 
@@ -75,6 +85,7 @@ class ETL:
             gcs_args["bucket_name"],
             gcs_args["blob_name"],
             gbq_args["schema"],
+            file_format=file_format
         )
 
         self.run_load(
@@ -88,50 +99,65 @@ class ETL:
 
         pass
 
-    def run_strava_ingest(self, response_json, endpoint, **kwargs):
+    def run_strava_ingest(self, response_json, endpoint, file_suffix, upload_only=True, file_format="json", transform_settings = {}, **kwargs):
 
-        file_suffix = kwargs[self.settings["etl"][endpoint]["file_suffix"]]
+        gcs_folder = kwargs.get("gcs_folder", endpoint)
 
-        assert file_suffix is not None
-
-        files_dict = self.gcs_obj.generate_file_locations(endpoint, suffix=file_suffix)
+        files_dict = self.gcs_obj.generate_file_locations(
+            endpoint, 
+            suffix=file_suffix, 
+            folder=gcs_folder,
+            file_format=file_format
+        )
 
         gcs_args = {
             "source_file_name": files_dict["file_path_local"],
-            "bucket_name": self.gbq_bucket_name,
+            "bucket_name": self.gcs_bucket_name,
             "blob_name": files_dict["file_path_gcs"],
         }
 
-        table_id = self.gbq_obj.create_table_id(
-            self.gcp_project, self.gbq_schema_name, endpoint
-        )
+        if upload_only:
 
-        gbq_args = {
-            "schema": self.settings["tables"][endpoint]["columns"],
-            "table_id": table_id,
-            "write_disposition": self.settings[self.gcp_env]["gbq"]["tables"][endpoint][
-                "write-disposition"
-            ],
-        }
+            self.run_upload(
+                self.gcs_obj,
+                response_json,
+                gcs_args["source_file_name"],
+                gcs_args["bucket_name"],
+                gcs_args["blob_name"],
+                file_format=file_format
+            )
+        
+        else:
 
-        transform_settings = self.settings["etl"][endpoint]["transform"]
+            table_id = self.gbq_obj.create_table_id(
+                self.gcp_project, self.gbq_schema_name, endpoint
+            )
 
-        transform_args = {
-            k: v for k, v in transform_settings.items() 
-            if k in ["explode_list_keys", "explode_dict_keys"]
-        }
+            gbq_args = {
+                "schema": self.settings["tables"][endpoint]["columns"],
+                "table_id": table_id,
+                "write_disposition": self.settings[self.gcp_env]["gbq"]["tables"][endpoint][
+                    "write-disposition"
+                ],
+            }
 
-        transform_args["set_values"] = {
-            k: kwargs[k] for k in transform_settings["set_value_columns"]
-        }
+            transform_args = {
+                k: v for k, v in transform_settings.items() 
+                if k in ["explode_list_keys", "explode_dict_keys"]
+            }
 
-        self.run_ingest(
-            response_json,
-            self.gcs_obj,
-            gcs_args,
-            self.gbq_obj,
-            gbq_args,
-            transform_args,
-        )
+            transform_args["set_values"] = {
+                k: kwargs[k] for k in transform_settings["set_value_columns"]
+            }
+
+            self.run_ingest(
+                response_json,
+                self.gcs_obj,
+                gcs_args,
+                self.gbq_obj,
+                gbq_args,
+                transform_args,
+                file_format=file_format
+            )
 
         print(f"Data ingestion complete for endpoint: {endpoint} \n")

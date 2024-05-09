@@ -8,11 +8,11 @@ class GoogleCloudStorage:
         credentials = service_account.Credentials.from_service_account_info(credentials_dict)
         self.gcs_client = storage.Client(project='strava-exploration-v2', credentials=credentials)
 
-    def generate_file_locations(self, endpoint, suffix):
+    def generate_file_locations(self, endpoint, suffix, folder, file_format="json"):
 
-        file_name = f'{endpoint}_{suffix}.csv'
-        file_path_local = f'data/{endpoint}/{file_name}'
-        file_path_gcs = f'{endpoint}/{file_name}'
+        file_name = f'{endpoint}_{suffix}.{file_format}'
+        file_path_local = f'data/{folder}/{file_name}'
+        file_path_gcs = f'{folder}/{file_name}'
 
         return {
             'file_name': file_name,

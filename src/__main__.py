@@ -83,7 +83,20 @@ def ingest_data():
     etl.run_strava_ingest(
         response_json=activities_json,
         endpoint="activities",
+        file_suffix=dt.run_date_str,
+        upload_only=False,
+        file_format="csv",
+        transform_settings=settings["etl"]["activities"]["transform"],
         last_updated=dt.current_date_str,
+    )
+
+    etl.run_strava_ingest(
+        response_json=activities_json,
+        endpoint="activities",
+        file_suffix=dt.run_date_str,
+        upload_only=True,
+        file_format="json",
+        gcs_folder="activities_json",
     )
 
     # - loop over activities -
@@ -97,6 +110,10 @@ def ingest_data():
         etl.run_strava_ingest(
             response_json=activity_laps_json,
             endpoint="activity_laps",
+            file_suffix=activity_id,
+            upload_only=False,
+            file_format="csv",
+            transform_settings=settings["etl"]["activity_laps"]["transform"],
             last_updated=dt.current_date_str,
             activity_id=activity_id,
         )
@@ -107,6 +124,10 @@ def ingest_data():
         etl.run_strava_ingest(
             response_json=activity_zones_json,
             endpoint="activity_zones",
+            file_suffix=activity_id,
+            upload_only=False,
+            file_format="csv",
+            transform_settings=settings["etl"]["activity_zones"]["transform"],
             last_updated=dt.current_date_str,
             activity_id=activity_id,
         )
@@ -124,8 +145,21 @@ def ingest_data():
         etl.run_strava_ingest(
             response_json=activity_streams_json,
             endpoint="activity_streams",
+            file_suffix=activity_id,
+            upload_only=False,
+            file_format="csv",
+            transform_settings=settings["etl"]["activity_streams"]["transform"],
             last_updated=dt.current_date_str,
             activity_id=activity_id,
+        )
+
+        etl.run_strava_ingest(
+            response_json=activity_streams_json,
+            endpoint="activity_streams",
+            file_suffix=activity_id,
+            upload_only=True,
+            file_format="json",
+            gcs_folder="activity_streams_json"
         )
 
     return "--- SUCCESS --- \n"
