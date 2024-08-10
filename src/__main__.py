@@ -83,7 +83,7 @@ def ingest_data():
     etl.run_strava_ingest(
         response_json=activities_json,
         endpoint="activities",
-        file_suffix=dt.run_date_str,
+        file_suffix=dt.current_date_str,
         upload_only=False,
         file_format="csv",
         transform_settings=settings["etl"]["activities"]["transform"],
@@ -93,7 +93,7 @@ def ingest_data():
     etl.run_strava_ingest(
         response_json=activities_json,
         endpoint="activities",
-        file_suffix=dt.run_date_str,
+        file_suffix=dt.current_date_str,
         upload_only=True,
         file_format="json",
         gcs_folder="activities_json",
