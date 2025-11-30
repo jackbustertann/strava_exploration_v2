@@ -84,16 +84,6 @@ def ingest_data():
         response_json=activities_json,
         endpoint="activities",
         file_suffix=dt.current_date_str,
-        upload_only=False,
-        file_format="csv",
-        transform_settings=settings["etl"]["activities"]["transform"],
-        last_updated=dt.current_date_str,
-    )
-
-    etl.run_strava_ingest(
-        response_json=activities_json,
-        endpoint="activities",
-        file_suffix=dt.current_date_str,
         upload_only=True,
         file_format="json",
         gcs_folder="activities_json",
@@ -111,25 +101,9 @@ def ingest_data():
             response_json=activity_laps_json,
             endpoint="activity_laps",
             file_suffix=activity_id,
-            upload_only=False,
-            file_format="csv",
-            transform_settings=settings["etl"]["activity_laps"]["transform"],
-            last_updated=dt.current_date_str,
-            activity_id=activity_id,
-        )
-
-        # - get activity zones data -
-        activity_zones_json = strava_api.get_activity_zones(activity_id)
-
-        etl.run_strava_ingest(
-            response_json=activity_zones_json,
-            endpoint="activity_zones",
-            file_suffix=activity_id,
-            upload_only=False,
-            file_format="csv",
-            transform_settings=settings["etl"]["activity_zones"]["transform"],
-            last_updated=dt.current_date_str,
-            activity_id=activity_id,
+            upload_only=True,
+            file_format="json",
+            gcs_folder="activity_laps_json"
         )
 
         # - get activity streams data - 
@@ -141,17 +115,6 @@ def ingest_data():
                 f"Streaming data doesn't exist for {activity_id}"
             )
             continue
-
-        etl.run_strava_ingest(
-            response_json=activity_streams_json,
-            endpoint="activity_streams",
-            file_suffix=activity_id,
-            upload_only=False,
-            file_format="csv",
-            transform_settings=settings["etl"]["activity_streams"]["transform"],
-            last_updated=dt.current_date_str,
-            activity_id=activity_id,
-        )
 
         etl.run_strava_ingest(
             response_json=activity_streams_json,
