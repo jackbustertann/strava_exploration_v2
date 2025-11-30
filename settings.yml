@@ -245,30 +245,6 @@ tables:
         type: STRING
       - name: activity_visibility
         type: STRING
-  activity_zones:
-    columns:
-      - name: score
-        type: FLOAT
-      - name: type
-        type: STRING
-      - name: resource_state
-        type: STRING
-      - name: sensor_based
-        type: BOOLEAN
-      - name: points
-        type: FLOAT
-      - name: custom_zones
-        type: BOOLEAN
-      - name: activity_id
-        type: STRING
-      - name: distribution_buckets_min
-        type: FLOAT
-      - name: distribution_buckets_max
-        type: FLOAT
-      - name: distribution_buckets_time
-        type: INTEGER
-      - name: last_updated
-        type: STRING
   activity_streams:
     columns:
       - name: temp
