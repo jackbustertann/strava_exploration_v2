@@ -103,8 +103,8 @@ jobs:
       - name: Build, Tag & Push
         shell: bash
         run: |
-          docker build . --file Dockerfile --tag us-central1-docker.pkg.dev/$PROJECT_ID/strava-exploration-v2-legacy/$CONTAINER_NAME:$CURRENT_VERSION
-          docker push us-central1-docker.pkg.dev/$PROJECT_ID/strava-exploration-v2-legacy/$CONTAINER_NAME:$CURRENT_VERSION
+          docker build . --file Dockerfile --tag gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION
+          docker push gcr.io/$PROJECT_ID/$CONTAINER_NAME:$CURRENT_VERSION
         env:
           CURRENT_VERSION: ${{ steps.get-latest-tag.outputs.tag }}
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
