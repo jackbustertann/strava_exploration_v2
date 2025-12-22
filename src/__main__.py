@@ -7,6 +7,7 @@ from src.extract.api import StravaAPI
 from src.etl import ETL
 from pprint import pprint
 import json, os
+from datetime import datetime, timedelta, timezone
 
 from flask import Flask
 
@@ -61,16 +62,24 @@ def ingest_data():
 
     dt.get_current_date()
 
-    dt.get_run_date(
-        gbq,
-        USE_RUN_DATE,
-        RUN_DATE,
-        gbq.create_table_id(
-            settings[GCP_ENV]["project"],
-            settings[GCP_ENV]["gbq"]["schema"],
-            "activities",
-        ),
-    )
+    # dt.get_run_date(
+    #     gbq,
+    #     USE_RUN_DATE,
+    #     RUN_DATE,
+    #     gbq.create_table_id(
+    #         settings[GCP_ENV]["project"],
+    #         settings[GCP_ENV]["gbq"]["schema"],
+    #         "activities",
+    #     ),
+    # )
+
+    # Set run date to yesterday at 8am UTC
+    yesterday = datetime.now(timezone.utc) - timedelta(days=1)
+    yesterday_8am = yesterday.replace(hour=8, minute=0, second=0, microsecond=0)
+    dt.run_datetime = yesterday_8am
+    dt.run_date_str = yesterday_8am.strftime('%Y-%m-%d')
+    dt.run_date_unix = int(yesterday_8am.timestamp())
+    print(f'Running script using run date: {dt.run_date_str} at 08:00 UTC\n')
 
     # - initiate etl obj -
 
@@ -91,6 +100,8 @@ def ingest_data():
 
     # - loop over activities -
     activity_ids = [activity["id"] for activity in activities_json]
+
+    print(f"Found {len(activity_ids)} activities to process \n")
 
     for activity_id in activity_ids:
 
