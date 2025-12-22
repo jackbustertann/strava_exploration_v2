@@ -73,7 +73,7 @@ def ingest_data():
     #     ),
     # )
 
-    # Set run date to yesterday at 8am UTC
+    # patch fix: set run date to yesterday at 8am UTC
     yesterday = datetime.now(timezone.utc) - timedelta(days=1)
     yesterday_8am = yesterday.replace(hour=8, minute=0, second=0, microsecond=0)
     dt.run_datetime = yesterday_8am
